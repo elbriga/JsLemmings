@@ -20,7 +20,7 @@ class Game {
     this.debug = false;
     //this.scoreFont = pygame.font.SysFont(None, 40);
     //this.skillsFont = pygame.font.SysFont(None, 30);
-    //Assets.load();
+    Assets.load();
     this.load_objects();
   }
 

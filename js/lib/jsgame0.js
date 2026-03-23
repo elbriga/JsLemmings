@@ -3165,7 +3165,12 @@ const screen = (function () {
         context.restore();
       }
       else if (object instanceof Surface) {
-        [x=0, y=0] = pos;
+        if (pos instanceof Rect) {
+          x = pos.x;
+          y = pos.y;
+        } else {
+          [x=0, y=0] = pos;
+        }
         context.save();
         context.putImageData(object.imageData, x, y);
         context.restore();
@@ -3653,11 +3658,23 @@ class Surface {
     return false;
   }
 
-  constructor(imageData) {
-    if (!(imageData instanceof ImageData)) {
-      throw new TypeError('imageData must be an ImageData.');
+  constructor() {
+    if (arguments.length == 1) {
+      var imageData = arguments[0];
+      if (!(imageData instanceof ImageData)) {
+        throw new TypeError('imageData must be an ImageData.');
+      }
+      this.imageData = imageData;
+    } else if (arguments.length == 2) {
+      this.imageData = new ImageData(arguments[0], arguments[1]);
+    } else {
+      throw new TypeError('invalid Surface constructor');
     }
-    this.imageData = imageData;
+    
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.ctx = this.canvas.getContext("2d");
   }
 
   get width() {
@@ -3744,5 +3761,62 @@ class Surface {
       // ImageData clamps the value if c is not in [0, 255]
       this.imageData.data[start+i] = c;
     }
+  }
+  
+  // img = <img>
+  // pos = [ x, y ]
+  // rect = [ x, y, width, height ]
+  blit(img, pos, rect = null) {
+    if (rect) {
+      this.ctx.drawImage(
+        img,
+        rect[0], rect[1], rect[2], rect[3], // origem (recorte)
+        pos[0], pos[1], rect[2], rect[3]    // destino
+      );
+    } else {
+      this.ctx.drawImage(img, pos[0], pos[1]);
+    }
+  }
+
+  scale2x() {
+    const newSurface = new Surface(this.width * 2, this.height * 2);
+
+    newSurface.ctx.imageSmoothingEnabled = false;
+
+    newSurface.ctx.drawImage(
+      this.canvas,
+      0, 0,
+      newSurface.width,
+      newSurface.height
+    );
+
+    return newSurface;
+  }
+
+  flip(horizontal = false, vertical = false) {
+    const newSurface = new Surface(this.width, this.height);
+    const ctx = newSurface.ctx;
+
+    ctx.imageSmoothingEnabled = false;
+
+    ctx.save();
+
+    // Move origem antes de inverter
+    ctx.translate(
+      horizontal ? this.width : 0,
+      vertical ? this.height : 0
+    );
+
+    // Inverte eixo
+    ctx.scale(
+      horizontal ? -1 : 1,
+      vertical ? -1 : 1
+    );
+
+    ctx.drawImage(this.canvas, 0, 0);
+
+    ctx.restore();
+
+    return newSurface;
   }
 }

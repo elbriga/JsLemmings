@@ -13,14 +13,14 @@ class Lemming extends Entity {
   }
 
   draw() {
-    screen.blit("lemming", this.rect);
-    /*
+    //screen.blit("lemming", this.rect);
+    
     var frame = this.frames[this.frame % this.frames.length]
     if (this.direction == -1) {
-        frame = pygame.transform.flip(frame, True, false);
+        frame = frame.flip(true, false);
     }
     screen.blit(frame, this.rect);
-    if ( this.hasUmbrella && this.stateName == "Walker") {
+    /*if ( this.hasUmbrella && this.stateName == "Walker") {
         pygame.draw.circle(screen, (255, 255, 0), self.pos, 5);
     }
     if (this.game.debug) {
@@ -30,8 +30,7 @@ class Lemming extends Entity {
             blockArea = pygame.Rect(this.rect.x, this.rect.centery, 40, 44);
             pygame.draw.rect(screen, (255,0,0), blockArea, 1);
         }
-    }
-    */
+    }*/
   }
 
   // update a lemming's position in the level
@@ -76,10 +75,6 @@ class Lemming extends Entity {
   }
 
   set_state(state) {
-
-  }
-
-  set_animation(anim) {
 
   }
 }
