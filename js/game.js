@@ -25,21 +25,64 @@ class Game {
   }
 
   update() {
-    const MAX_LEMMINGS = 10;
-    const INTERVAL = 10;
+    //mx, my = pygame.mouse.get_pos();
+    //this.hovered = this.get_lemming_near(mx, my);
 
-    // increment the timer and create a new
-    // lemming if the interval has passed
-    this.addTimer += 0.1;
-    if ((this.addTimer > INTERVAL) && (this.lemmings.length < MAX_LEMMINGS)) {
-      this.addTimer = 0;
-      this.lemmings.push(new Lemming(this));
-      console.log("NEW LEMMING");
+    if (this.paused)
+      return;
+
+    if (this.totLemmings < this.level.config.numLemmings && !this.quitting) {
+      this.addTimer += 0.1;
+      // Add lemming se o intervalo passou
+      if (this.addTimer > this.level.config.releaseRate) {
+        this.addTimer = 0;
+        this.totLemmings += 1;
+        this.lemmings.push(new Lemming(this));
+        console.log("NEW LEMMING");
+      }
     }
 
-    // update each lemming's position in the level
-    for (let i of this.lemmings) {
-      i.update();
+    // Atualizar os Lemmings
+    for (let lem of this.lemmings) {
+      if (!lem.dead) {
+        lem.update();
+/* TODO
+        // Checar pela saida
+        if lem.is_near(this.level.config.endPosition, 6):
+            this.points += 1;
+            lem.die("gone");
+        // Checar se caiu para fora da tela
+        elif lem.rect.y > this.height:
+            lem.die("null");
+*/
+      }
+
+      // Animacao
+      lem.animTimer += 1;
+      if (lem.animTimer > 3) {
+        lem.animTimer = 0;
+        lem.frame = (lem.frame + 1) % lem.frames.length;
+        if (lem.frame == 0) {
+/*
+          lem.on_cycle_anim()
+          if lem.animNext != "":
+              lem.on_change_anim()
+              lem.set_animation(lem.animNext)
+          elif lem.dead:
+              # Remover os lemmings mortos no final da animacao
+              this.lemmings.remove(lem)
+              # Verificar se terminou a fase
+              if len(this.lemmings) == 0:
+                  if this.quitting:
+                      this.running = False # Quebra o loop principal
+                  else:
+                      # Mostrar a tela de End Level
+                      win = this.points >= this.level.config.numLemmingsToSave
+                      this.endScene = pygame.image.load(f'images/end{"Win" if win else "Lose"}.png').convert()
+                      this.paused = True
+*/
+        }
+      }
     }
   }
 
