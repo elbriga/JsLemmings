@@ -1,7 +1,40 @@
+function debugSprite(sprite, label = "") {
+  const container = document.createElement("div");
+
+  const canvas = sprite.canvas || document.createElement("canvas");
+
+  if (!sprite.canvas) {
+    canvas.width = sprite.width;
+    canvas.height = sprite.height;
+    canvas.getContext("2d").drawImage(sprite, 0, 0);
+  }
+
+  const text = document.createElement("div");
+  text.innerText = label;
+  text.style.color = "white";
+  text.style.fontSize = "10px";
+
+  canvas.style.border = "1px solid red";
+  canvas.style.imageRendering = "pixelated";
+
+  container.appendChild(canvas);
+  container.appendChild(text);
+
+  document.getElementById("debug").appendChild(container);
+}
+
 class Assets {
-    static animations = {}
-    static final_width = 10  // x4
-    static final_height = 20 // x4
+    static animations = {};
+    static final_width = 10;  // x4
+    static final_height = 20; // x4
+
+    static async loadImage(src) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = src;
+        });
+    }
 
     static slice_sprites(sheet, total, xi, yi, step, width, height) {
         var sprites = [];
@@ -17,23 +50,38 @@ class Assets {
         return sprites
     }
 
-    static load() {
+    static async load() {
         // https://www.spriters-resource.com/amiga_amiga_cd32/lemmings/asset/37732/
-        var sheet = images.lemming_sheet;
+        var sheet = await Assets.loadImage("images/lemming_sheet.png");
 
-        Assets.animations["lemming_null"]  = Assets.slice_sprites(sheet, 1, 0, 0, 16, 10, 10);
-        Assets.animations["lemming_walk"]  = Assets.slice_sprites(sheet, 8, 18, 0, 16, 10, 10);
-        Assets.animations["lemming_fall"]  = Assets.slice_sprites(sheet, 4, 14, 20, 16, 10, 10);
-        Assets.animations["lemming_open"]  = Assets.slice_sprites(sheet, 4, 19, 96, 16, 10, 16);
-        Assets.animations["lemming_float"] = Assets.slice_sprites(sheet, 4, 83, 96, 16, 10, 16);
-        Assets.animations["lemming_splat"] = Assets.slice_sprites(sheet, 16, 19, 138, 16, 10, 10);
-        Assets.animations["lemming_stop"]  = Assets.slice_sprites(sheet, 16, 20, 148, 16, 10, 10);
-        Assets.animations["lemming_burn"]  = Assets.slice_sprites(sheet, 16, 19, 169, 16, 10, 12);
-        Assets.animations["lemming_dig"]   = Assets.slice_sprites(sheet, 16, 20, 247, 16, 10, 14);
-        Assets.animations["lemming_build"] = Assets.slice_sprites(sheet, 16, 19, 195, 16, 10, 13);
-        Assets.animations["lemming_done"]  = Assets.slice_sprites(sheet, 8, 20, 224, 16, 10, 10);
-        Assets.animations["lemming_boom"]  = Assets.slice_sprites(sheet, 16, 19, 128, 16, 10, 10);
-        Assets.animations["lemming_gone"]  = Assets.slice_sprites(sheet, 8, 18, 182, 16, 10, 14);
+        const process = () => {
+            Assets.animations["lemming_null"]  = Assets.slice_sprites(sheet, 1, 0, 0, 16, 10, 10);
+            Assets.animations["lemming_walk"]  = Assets.slice_sprites(sheet, 8, 18, 0, 16, 10, 10);
+            Assets.animations["lemming_fall"]  = Assets.slice_sprites(sheet, 4, 14, 20, 16, 10, 10);
+            Assets.animations["lemming_open"]  = Assets.slice_sprites(sheet, 4, 19, 96, 16, 10, 16);
+            Assets.animations["lemming_float"] = Assets.slice_sprites(sheet, 4, 83, 96, 16, 10, 16);
+            Assets.animations["lemming_splat"] = Assets.slice_sprites(sheet, 16, 19, 138, 16, 10, 10);
+            Assets.animations["lemming_stop"]  = Assets.slice_sprites(sheet, 16, 20, 148, 16, 10, 10);
+            Assets.animations["lemming_burn"]  = Assets.slice_sprites(sheet, 16, 19, 169, 16, 10, 12);
+            Assets.animations["lemming_dig"]   = Assets.slice_sprites(sheet, 16, 20, 247, 16, 10, 14);
+            Assets.animations["lemming_build"] = Assets.slice_sprites(sheet, 16, 19, 195, 16, 10, 13);
+            Assets.animations["lemming_done"]  = Assets.slice_sprites(sheet, 8, 20, 224, 16, 10, 10);
+            Assets.animations["lemming_boom"]  = Assets.slice_sprites(sheet, 16, 19, 128, 16, 10, 10);
+            Assets.animations["lemming_gone"]  = Assets.slice_sprites(sheet, 8, 18, 182, 16, 10, 14);
+
+            console.log("Sprites carregados ✔");
+
+            // Teste
+            debugSprite(Assets.animations["lemming_walk"][0], "teste");
+        };
+
+        if (sheet.complete) {
+            process();
+        } else {
+            sheet.onload = process;
+        }
+        return;
+        
 
         // https://opengameart.org/content/explosion
         sheet = images.explosion;
