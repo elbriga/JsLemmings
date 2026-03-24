@@ -162,6 +162,7 @@ class Surface {
       // ImageData clamps the value if c is not in [0, 255]
       this.imageData.data[start+i] = c;
     }
+    this.ctx.putImageData(this.imageData, 0, 0, x, y, 1, 1);
   }
   
   // img = <img>
@@ -193,6 +194,8 @@ class Surface {
       newSurface.height
     );
 
+    newSurface.imageData = newSurface.ctx.getImageData(0, 0, newSurface.width, newSurface.height);
+
     return newSurface;
   }
 
@@ -219,6 +222,8 @@ class Surface {
     ctx.drawImage(this.canvas, 0, 0);
 
     ctx.restore();
+
+    newSurface.imageData = ctx.getImageData(0, 0, newSurface.width, newSurface.height);
 
     return newSurface;
   }
