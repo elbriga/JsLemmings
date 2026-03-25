@@ -25,6 +25,7 @@ body {
   <script src="js/lib/sprite.js"></script>
   <script src="js/lib/input.js"></script>
 
+  <script src="js/events.js"></script>
   <script src="js/assets.js"></script>
   <script src="js/level.js"></script>
   <script src="js/game.js"></script>
@@ -66,7 +67,16 @@ function on_mouse_move(pos, delta, buttons) {
   Input.updateMouse(pos, delta, buttons);
 }
 
+function on_mouse_down(pos, buttons) {
+  Events.on_mouse_click(game, buttons, pos);
+}
+
 window.addEventListener('load', async (event) => {
+  const canvas = document.getElementById("screen");
+  canvas.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  });
+
   screen.init();
 });
 </script>
