@@ -71,45 +71,6 @@ class Faller extends LemmingState {
             lem.set_state("Floater");
     } else if (lem.falling > 20 && lem.falling < 26)
         lem.set_animation("fall");
-/*
-    // if there's no ground below a lemming (check both corners), it is falling
-    let bottomleft = this.lem.game.level.is_solid(this.lem.x - (this.lem.rect.width / 2), this.lem.y + 1),
-        bottomright = this.lem.game.level.is_solid(this.lem.x + (this.lem.rect.width / 2), this.lem.y + 1),
-        height = 0,
-        found = false,
-        positioninfront;
-    if ((!bottomleft) && (!bottomright)) {
-      this.lem.rect.y += 1;
-    }
-    // if not falling, a lemming is walking
-    else {
-      // find the height of the ground in front of a lemming
-      // up to the maximum height a lemming can climb
-      while ((!found) && (height <= this.lem.climbHeight)) {
-        // the pixel 'in front' of a lemming will depend on
-        // the direction it's traveling
-        if (this.lem.direction === 1) {
-          positioninfront = this.lem.x + (this.lem.rect.width / 2);
-        }
-        else {
-          positioninfront = this.lem.x - (this.lem.rect.width / 2);
-        }
-        if (!this.lem.game.level.is_solid(positioninfront, this.lem.y - height)) {
-          this.lem.rect.x += this.lem.direction;
-          // rise up to new ground level
-          this.lem.rect.y -= height;
-          found = true;
-        }
-
-        height += 1;
-      }
-      // turn the lemming around if the ground in front
-      // is too high to climb
-      if (!found) {
-        this.lem.direction *= -1;
-      }
-    }
-*/
   }
 }
 
