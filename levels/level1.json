@@ -1,0 +1,28 @@
+{
+  "numLemmings": 10,
+  "numLemmingsToSave": 5,
+  "releaseRate": 10,
+  "timeLimit": 300,
+  "backgroundColour": [114, 114, 201],
+
+  "music": "level1",
+  "background": "cave",
+
+  "skills": {
+    "Blocker": 1,
+    "Umbrella": 1,
+    "Exploder": 5,
+    "Builder": 2
+  },
+
+  "objects": [
+    {"type": "entrance", "x": 100, "y": 100},
+    {"type": "exit", "x": 580, "y": 722},
+
+    {"type":"tnt","x":450,"y":240},
+    {"type":"tocha","x":300,"y":180,"w":64,"h":32},
+    
+    {"type":"trap","x":600,"y":210},
+    {"type":"decoration","sprite":"tree","x":200,"y":150}
+  ]
+}
