@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-<html lang="en-US">
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,23 +22,14 @@ body {
   <script src="js/lib/jsgame0.js"></script>
   <script src="js/lib/screen.js"></script>
   <script src="js/lib/surface.js"></script>
+  <script src="js/lib/sprite.js"></script>
 
   <script src="js/assets.js"></script>
   <script src="js/level.js"></script>
   <script src="js/game.js"></script>
   <script src="js/entity.js"></script>
   <script src="js/lemming.js"></script>
-
-<section id="imageLoader" class="hidden">
-  <img class="hidden" src="images/lemming.png" alt="lemming" data-name="lemming">
-  <img class="hidden" src="images/level.png" alt="level" data-name="level">
-
-  <img class="hidden" src="images/lemming_sheet.png" alt="level" data-name="lemming_sheet">
-  <img class="hidden" src="images/explosion.png" alt="level" data-name="explosion">
-  <img class="hidden" src="images/portal.png" alt="level" data-name="portal">
-  <img class="hidden" src="images/tnt.png" alt="level" data-name="tnt">
-</section>
-
+  <script src="js/lemmingState.js"></script>
 <main>
 <h1>lemmings</h1>
 
@@ -59,32 +49,15 @@ WIDTH = 800;
 
 var game = undefined;
 
-// level information
-const BACKGROUND_COLOUR = [114, 114, 201, 255];
-
-// store the colour of each pixel in the level image
-var pixels;
-
-// a list to keep track of the lemmings
-var lemmings;
-const START_POSITION = [100, 100];
-
 function reset() {
+  console.log("reset()");
+/*
   const LEVEL_IMAGE = 'level';
   screen.blit(LEVEL_IMAGE, [0, 0]);
   pixels = screen.getSurface();
   lemmings = [];
   timer = 0;
-}
-
-// returns 'True' if the pixel specified is 'ground'
-// (i.e. anything except BACKGROUND_COLOUR)
-function groundatposition(pos) {
-  // ensure position contains integer values
-  let x = Math.trunc(pos[0]),
-      y = Math.trunc(pos[1]);
-  // get the colour from the 'pixels' list
-  return (!Surface.isColorEqual(pixels.getAt(x, y), BACKGROUND_COLOUR));
+*/
 }
 
 function update() {
@@ -95,9 +68,9 @@ function draw() {
   game.draw();
 }
 
-window.addEventListener('load', (event) => {
+window.addEventListener('load', async (event) => {
   screen.init();
-  game = new Game(1);
+  game = await Game.create(1);
 });
 </script>
 </body>

@@ -8,6 +8,7 @@ class Lemming extends Entity {
     this.stepCount = 20; // Quantos degraus tem na bolsa!
     this.falling = 0;
     this.hasUmbrella = false;
+    this.remove = false;
     this.set_state("Faller");  // Faller nao seta a animation!
     this.set_animation("fall");
   }
@@ -33,48 +34,103 @@ class Lemming extends Entity {
     }*/
   }
 
-  // update a lemming's position in the level
-  update() {
-    // if there's no ground below a lemming (check both corners), it is falling
-    let bottomleft = groundatposition([this.x - (this.rect.width / 2), this.y + 1]),
-        bottomright = groundatposition([this.x + (this.rect.width / 2), this.y + 1]),
-        height = 0,
-        found = false,
-        positioninfront;
-    if ((!bottomleft) && (!bottomright)) {
-      this.rect.y += 1;
+    // update a lemming's position in the level
+    update(isRecursion=false) {
+        this.state.update(isRecursion);
     }
-    // if not falling, a lemming is walking
-    else {
-      // find the height of the ground in front of a lemming
-      // up to the maximum height a lemming can climb
-      while ((!found) && (height <= this.climbHeight)) {
-        // the pixel 'in front' of a lemming will depend on
-        // the direction it's traveling
-        if (this.direction === 1) {
-          positioninfront = [this.x + (this.rect.width / 2), this.y - height];
-        }
-        else {
-          positioninfront = [this.x - (this.rect.width / 2), this.y - height];
-        }
-        if (!groundatposition(positioninfront)) {
-          this.rect.x += this.direction;
-          // rise up to new ground level
-          this.rect.y -= height;
-          found = true;
-        }
 
-        height += 1;
-      }
-      // turn the lemming around if the ground in front
-      // is too high to climb
-      if (!found) {
-        this.direction *= -1;
-      }
+    // Repassar os eventos para o estado
+    on_cycle_anim() {
+        this.state.on_cycle_anim();
     }
-  }
+    on_change_anim() {
+        this.state.on_change_anim();
+    }
 
-  set_state(state) {
+    give_skill() {
+        const game = this.game;
+        const skill = game.selectedSkill;
+        if (skill != "" && game.level.config.skills[skill] > 0) {
+            game.level.config.skills[skill] -= 1;
+            if (skill == "Umbrella")
+                this.hasUmbrella = true;
+            else
+                this.set_state(skill);
+        }
+    }
 
-  }
+    is_near(pos, distance) {
+        myRect = pygame.Rect(self.x - distance, self.y - distance, distance * 2, distance * 2)
+        target = pygame.Rect(pos[0] - distance, pos[1] - distance, distance * 2, distance * 2)
+        return myRect.colliderect(target)
+    }
+
+    is_on_floor() {
+        return (
+            this.game.level.is_solid(this.rect.left,  this.rect.bottom + 1) ||
+            this.game.level.is_solid(this.x,          this.rect.bottom + 1) ||
+            this.game.level.is_solid(this.rect.right, this.rect.bottom + 1)
+        );
+    }
+
+    floor_height_in_front() {
+        var height = 0;
+        // Achar a altura do chao na frente do lemming, ate a altura que ele consegue subir
+        while (height <= this.climbHeight) {
+            // O pixel 'na frente' do lemming depende da direcao dele
+            const positionInFront = this.direction == 1 ? this.rect.right : this.rect.left;
+            if (!this.game.level.is_solid(positionInFront, this.rect.bottom - height)) {
+                break;
+            }
+            height += 1;
+        }
+        return height;
+    }
+
+    set_state(stateName) {
+        const die   = stateName == "Exploder" || stateName == "Dying";
+        const block = stateName == "Blocker"  || this.stateName == "Blocker";
+
+        this.stateName  = stateName;
+        this.stateTimer = 0;
+
+        const stateClass = LemmingState.states[stateName][0];
+        this.state       = new stateClass(this);
+        
+        const stateAnim = LemmingState.states[stateName][1];
+        if (stateAnim != "") {
+            const stateAnimNext = LemmingState.states[stateName][2];
+            this.set_animation(stateAnim, stateAnimNext);
+        }
+        if (block || die) {
+            // Atualizar mascara de block
+            this.game.level.build_blocker_mask(this.game.lemmings);
+            if (die) {
+                this.dead = true;
+            }
+        }
+    }
+
+    die(anim, nextAnim="") {
+        this.set_state("Dying");
+        this.set_animation(anim, nextAnim);
+    }
+
+    dig() {
+        // Se abaixar!
+        this.rect.y += 10;
+        this.set_state("Digger");
+    }
+
+    build() {
+        this.set_state("Builder");
+    }
+
+    burn() {
+        this.die("burn");
+    }
+
+    explode() {
+        this.set_state("Exploder");
+    }
 }

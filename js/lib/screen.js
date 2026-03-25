@@ -821,6 +821,13 @@ const screen = (function () {
         context.drawImage(image, 0, 0);
         context.restore();
       }
+      else if (object instanceof Sprite) {
+        x = pos.x;
+        y = pos.y;
+        context.save();
+        context.drawImage(object.canvas, x, y);
+        context.restore();
+      }
       else if (object instanceof Surface) {
         if (pos instanceof Rect) {
           x = pos.x;

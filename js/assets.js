@@ -28,21 +28,36 @@ class Assets {
     static final_width = 10;  // x4
     static final_height = 20; // x4
 
-    static async loadImage(src) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.src = src;
-        });
+    static async loadImage(url) {
+        const img = new Image();
+        img.src = url;
+
+        await img.decode(); // ou usar onload
+        return img;
+    }
+
+    static async loadSurface(url) { 
+        const img = await Assets.loadImage(url);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+
+        return new Surface(imageData);
     }
 
     static slice_sprites(sheet, total, xi, yi, step, width, height) {
         var sprites = [];
         for (var i = 0; i < total; i++) {
             var x = xi + i * step;
-            var sprite = new Surface(Assets.final_width, Assets.final_height);
+            var sprite = new Sprite(Assets.final_width, Assets.final_height);
             sprite.blit(sheet, [ 0, Assets.final_height - height ], [ x, yi, width, height ]);
-            //sprite.set_colorkey((0, 0, 0));
+            sprite.set_colorkey(0, 0, 0);
             sprite = sprite.scale2x();
             sprite = sprite.scale2x();
             sprites.push(sprite);

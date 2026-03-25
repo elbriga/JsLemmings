@@ -59,12 +59,14 @@ class Surface {
   }
 
   constructor() {
+    var init = false;
     if (arguments.length == 1) {
       var imageData = arguments[0];
       if (!(imageData instanceof ImageData)) {
         throw new TypeError('imageData must be an ImageData.');
       }
       this.imageData = imageData;
+      init = true;
     } else if (arguments.length == 2) {
       this.imageData = new ImageData(arguments[0], arguments[1]);
     } else {
@@ -75,7 +77,10 @@ class Surface {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.putImageData(this.imageData, 0, 0);
+    if (init) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.putImageData(this.imageData, 0, 0);
+    }
   }
 
   get width() {
@@ -83,6 +88,23 @@ class Surface {
   }
   get height() {
     return this.imageData.height;
+  }
+
+  // img = <img>
+  // pos = [ x, y ]
+  // rect = [ x, y, width, height ]
+  blit(img, pos, rect = null) {
+    var source = img.canvas || img;
+    if (rect) {
+      this.ctx.drawImage(
+        source,
+        rect[0], rect[1], rect[2], rect[3], // origem (recorte)
+        pos[0], pos[1], rect[2], rect[3]    // destino
+      );
+    } else {
+      this.ctx.drawImage(source, pos[0], pos[1]);
+    }
+    this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }
 
   /*
@@ -163,23 +185,6 @@ class Surface {
       this.imageData.data[start+i] = c;
     }
     this.ctx.putImageData(this.imageData, 0, 0, x, y, 1, 1);
-  }
-  
-  // img = <img>
-  // pos = [ x, y ]
-  // rect = [ x, y, width, height ]
-  blit(img, pos, rect = null) {
-    var source = img.canvas || img;
-    if (rect) {
-      this.ctx.drawImage(
-        source,
-        rect[0], rect[1], rect[2], rect[3], // origem (recorte)
-        pos[0], pos[1], rect[2], rect[3]    // destino
-      );
-    } else {
-      this.ctx.drawImage(source, pos[0], pos[1]);
-    }
-    this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }
 
   scale2x() {
