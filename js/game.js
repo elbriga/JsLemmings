@@ -16,7 +16,7 @@ class Game {
     this.newLevel = undefined; // Controla o Spawn de um novo Level ou o mesmo (reset)
     this.points = 0;
     this.totLemmings = 0;
-    this.selectedSkill = "";
+    this.selectedSkill = "Builder";
     this.minHeightToDie = 200;
     this.addTimer = 0;
     this.paused = false;

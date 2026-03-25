@@ -74,13 +74,59 @@ class Faller extends LemmingState {
   }
 }
 
-class Floater extends LemmingState {}
+class Floater extends LemmingState {
+  update(isRecursion=false) {
+    const lem = this.lem;
+    if (lem.is_on_floor()) {
+        lem.set_state("Walker");
+        return;
+    }
+    lem.rect.y += 1;
+  }
+}
 
-class Digger extends LemmingState {}
+class Digger extends LemmingState {
+  update(isRecursion=false) {
+    const lem = this.lem;
+    lem.stateTimer += 1;
+    if (lem.stateTimer > 20) {
+      lem.stateTimer = 0;
+      // Dig
+      lem.game.level.dig(lem.rect.x - 2, lem.rect.bottom - 10);
+      lem.rect.y += 3;
+      if (!lem.is_on_floor()) {
+        lem.game.level.dig(lem.rect.x - 2, lem.rect.bottom - 10);
+        lem.set_state("Faller");
+      }
+    }
+  }
+}
 
-class Exploder extends LemmingState {}
+class Exploder extends LemmingState {
+  on_change_anim() {
+    const lem = this.lem;
+    lem.game.level.dig_hole(lem.pos);
+    lem.rect.x -= 12; // HACK feio! Explosao é maior
+  }
+}
 
-class Builder extends LemmingState {}
+class Builder extends LemmingState {
+  on_cycle_anim() {
+    const lem = this.lem;
+    if (lem.stateTimer >= lem.stepCount) {
+      lem.set_state("Walker");
+      return;
+    }
+    else if (lem.stateTimer >= lem.stepCount - 1) {
+        lem.set_animation("done")
+    }
+    // Novo degrau
+    lem.game.level.add_step(lem.pos, lem.direction);
+    lem.rect.x += (4 * lem.direction);
+    lem.rect.y -= 4;
+    lem.stateTimer += 1; // Contar os degraus
+  }
+}
 
 class Dying extends LemmingState {}
 

@@ -64,6 +64,40 @@ class Level {
       }
     }
   }
+
+  // Corta um pedaco do terreno
+  dig(pos) {
+    const x = Math.floor(pos[0]);
+    const y = Math.floor(pos[1]);
+    const digRect = new Rect(x, y, this.digWidth, this.digHeight);
+    /*
+    pygame.draw.rect(self.terrain, self.config.backgroundColour, digRect)
+    self.terrainMask.erase(self.digShape, posInt)
+    */
+  }
+  
+  dig_hole(pos) {
+      const x = Math.floor(pos[0]);
+      const y = Math.floor(pos[1]);
+      // TODO
+      // apagar visualmente no terreno
+      //screen.draw.circle(self.terrain, self.config.backgroundColour, (x, y), self.explosionRadius)
+      // remover da máscara do terreno
+      //self.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
+  }
+
+  // Adicionar um degrau
+  add_step(pos, direction) {
+    const x = Math.floor(pos[0]) + (4 * direction);
+    const y = Math.floor(pos[1]) - this.stepHeight;
+    if (direction == -1) {
+      x -= this.stepWidth;
+    }
+    // criar visualmente no terreno
+    //pygame.draw.rect(self.terrain, self.config.stepColour, (x, y, self.stepWidth, self.stepHeight))
+    // criar na máscara do terreno
+    //self.terrainMask.draw(self.stepShape, (x, y))
+  }
 }
 
 class LevelConfig {
@@ -71,11 +105,11 @@ class LevelConfig {
     // Defaults
     this.number = 0;
     this.skills = {
-        "Blocker":  0,
-        "Exploder": 0,
-        "Digger":   0,
-        "Builder":  0,
-        "Umbrella": 0,
+        "Blocker":  10,
+        "Exploder": 10,
+        "Digger":   10,
+        "Builder":  10,
+        "Umbrella": 10,
     };
     this.objects = [];
     this.numLemmings = 10;
