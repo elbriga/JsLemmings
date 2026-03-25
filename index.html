@@ -23,6 +23,7 @@ body {
   <script src="js/lib/screen.js"></script>
   <script src="js/lib/surface.js"></script>
   <script src="js/lib/sprite.js"></script>
+  <script src="js/lib/input.js"></script>
 
   <script src="js/assets.js"></script>
   <script src="js/level.js"></script>
@@ -43,34 +44,30 @@ The game screen appears here if your browser supports the Canvas API.
 <div id="debug">DEBUG</div>
 </main>
 <script>
+var game = undefined;
 // screen size
 HEIGHT = 800;
 WIDTH = 800;
 
-var game = undefined;
-
-function reset() {
+async function reset() {
   console.log("reset()");
-/*
-  const LEVEL_IMAGE = 'level';
-  screen.blit(LEVEL_IMAGE, [0, 0]);
-  pixels = screen.getSurface();
-  lemmings = [];
-  timer = 0;
-*/
+  game = await Game.create(1);
 }
 
 function update() {
-  game.update();
+  if(game) game.update();
 }
 
 function draw() {
-  game.draw();
+  if(game) game.draw();
+}
+
+function on_mouse_move(pos, delta, buttons) {
+  Input.updateMouse(pos, delta, buttons);
 }
 
 window.addEventListener('load', async (event) => {
   screen.init();
-  game = await Game.create(1);
 });
 </script>
 </body>

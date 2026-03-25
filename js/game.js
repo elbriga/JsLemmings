@@ -25,7 +25,6 @@ class Game {
     this.debug = false;
     //this.scoreFont = pygame.font.SysFont(None, 40);
     //this.skillsFont = pygame.font.SysFont(None, 30);
-    //this.ready = this._load(numLevel);
   }
 
   async _load(numLevel) {
@@ -39,8 +38,7 @@ class Game {
   }
 
   update() {
-    //mx, my = pygame.mouse.get_pos();
-    //this.hovered = this.get_lemming_near(mx, my);
+    this.hovered = this.get_lemming_near(Input.mouse.x, Input.mouse.y);
 
     if (this.paused)
       return;
@@ -139,10 +137,11 @@ class Game {
         lem.draw();
     }
 
+    // Desenhar o selecionado
+    if (this.hovered) {
+      screen.draw.circle([ this.hovered.x, this.hovered.y - this.hovered.rect.height / 4 ], 25, [0, 255, 0, 255], 3);
+    }
 /* TODO
-    # Desenhar o selecionado
-    if ( this.hovered:
-        pygame.draw.circle(this.screen, (0, 255, 0), (this.hovered.x, this.hovered.y - this.hovered.rect.height // 4), 25, 3)
     # Desenhar o score
     text = this.scoreFont.render(f"Lemmings: {len(this.lemmings)} - Pontos: {this.points} / {this.level.config.numLemmingsToSave}", True, (255, 255, 255))
     this.screen.blit(text, (10, 10))
@@ -164,6 +163,21 @@ class Game {
         b = 5
         pygame.draw.rect(this.screen, (255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10)
 */
+  }
+
+  get_lemming_near(mx, my, radius=80) {
+    var best = undefined;
+    var best_dist = radius * radius;
+    for (const lem of this.lemmings) {
+        const dx = lem.x - mx;
+        const dy = lem.y - my;
+        const dist = dx * dx + dy * dy;
+        if (dist < best_dist) {
+            best = lem;
+            best_dist = dist;
+        }
+    }
+    return best
   }
 
   load_objects() {
