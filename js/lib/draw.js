@@ -159,7 +159,12 @@ class Draw {
                 }
 
                 context.save();
-                context.fillStyle = Draw.parseColor(color);
+                if (color == "erase") {
+                    context.globalCompositeOperation = "destination-out";
+                    context.fillStyle = 'black';
+                } else {
+                    context.fillStyle = Draw.parseColor(color);
+                }
 
                 let [x=0, y=0] = pos;
                 context.beginPath();

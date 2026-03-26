@@ -128,14 +128,7 @@ class Game {
   }
 
   draw() {
-    // Desenhar o level
-    screen.fill(this.level.config.backgroundColour);
-    screen.blit(this.level.terrain, [0, 0]);
-    if (this.showMask) {
-    // } else {
-      screen.blit(this.level.blockerMask, [0, 0]);
-      screen.blit(this.level.terrainMask, [0, 0]);
-    }
+    this.level.draw(screen, this.showMask);
 
     // Desenhar os Objetos
     for (let o of this.entities) {

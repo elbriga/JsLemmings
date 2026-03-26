@@ -8,13 +8,15 @@ class Level {
   async _load(number) {
     this.config = new LevelConfig();
 
-    const [ terrain, mask ] = await Promise.all([
+    const [ terrain, mask, bg ] = await Promise.all([
       Assets.loadSurface(`levels/level${number}.png`),
       Assets.loadSurface(`levels/level${number}-mask.png`),
+      Assets.loadSurface(`levels/level${number}-bg.png`),
       this.config._load(number),
     ]);
 
     this.terrain = terrain;
+    this.terrainBg = bg;
     this.terrainMask = mask; // TODO :: Classe Mask
     this.terrainMask.set_colorkey(0, 0, 0);
     this.terrainMask.reloadImageData(); // Hack!!
@@ -36,6 +38,18 @@ class Level {
     this.stepWidth = 16;
     this.stepHeight = 4;
     //this.stepShape = new Surface(this.stepWidth, this.stepHeight + 2);
+  }
+
+  draw(screen, showMask=false) {
+    // Desenhar o level
+    //screen.fill(this.config.backgroundColour);
+    screen.blit(this.terrainBg, [0, 0]);
+    screen.blit(this.terrain, [0, 0]);
+
+    if (showMask) {
+      screen.blit(this.blockerMask, [0, 0]);
+      screen.blit(this.terrainMask, [0, 0]);
+    }
   }
 
   // Verifica se um pixel eh solido no mapa ou nos Blocker's
@@ -78,11 +92,11 @@ class Level {
       const x = Math.floor(pos[0]);
       const y = Math.floor(pos[1]);
       // apagar visualmente no terreno
-      this.terrain.draw.filled_circle([ x, y ], this.explosionRadius, this.config.backgroundColour);
+      this.terrain.draw.filled_circle([ x, y ], this.explosionRadius, "erase");
       this.terrain.reloadImageData(); // Hack!!
       // remover da máscara do terreno
       // TODO :: Classe Mask           this.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
-      this.terrainMask.draw.filled_circle([ x, y ], this.explosionRadius, [ 0,0,0 ]);
+      this.terrainMask.draw.filled_circle([ x, y ], this.explosionRadius, "erase");
       this.terrainMask.reloadImageData(); // Hack!!
     }
     
