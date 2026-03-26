@@ -102,12 +102,12 @@ class Lemming extends Entity {
             const stateAnimNext = LemmingState.states[stateName][2];
             this.set_animation(stateAnim, stateAnimNext);
         }
-        if (block || die) {
+        if (block) {
             // Atualizar mascara de block
             this.game.level.build_blocker_mask(this.game.lemmings);
-            if (die) {
-                this.dead = true;
-            }
+        }
+        if (die) {
+            this.dead = true;
         }
     }
 
