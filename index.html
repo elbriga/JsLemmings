@@ -40,6 +40,20 @@ The game screen appears here if your browser supports the Canvas API.
   <button type="button" id="reset">Reset</button>
   <button type="button" id="pause">Pause</button>
 </section>
+<div id="keysHelp">
+  <pre>
+  case "q":   game.quit();
+  case "p":   game.toggle_paused();
+  case "m":   game.toggle_show_mask();
+  case "w":   game.toggle_debug();
+
+  case "b": game.select_skill("Blocker");
+  case "x": game.select_skill("Exploder");
+  case "d": game.select_skill("Digger");
+  case "c": game.select_skill("Builder");
+  case "g": game.select_skill("Umbrella");
+  </pre>
+</div>
 <div id="debug">DEBUG</div>
 </main>
 <script>

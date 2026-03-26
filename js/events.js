@@ -44,7 +44,7 @@ class Events {
             case "q":   game.quit();             break;
             case "p":   game.toggle_paused();    break;
             case "m":   game.toggle_show_mask(); break;
-            case "F10": game.toggle_debug();     break;
+            case "w":   game.toggle_debug();     break;
 
             case "b": game.select_skill("Blocker");  break;
             case "x": game.select_skill("Exploder"); break;
