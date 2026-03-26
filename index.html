@@ -58,13 +58,15 @@ The game screen appears here if your browser supports the Canvas API.
 </main>
 <script>
 var game = undefined;
+let numLevel = 1;
+
 // screen size
 HEIGHT = 800;
 WIDTH = 800;
 
 async function reset() {
   console.log("reset()");
-  game = await Game.create(1);
+  game = await Game.create(numLevel);
 }
 
 function update() {
