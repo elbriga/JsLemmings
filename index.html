@@ -66,7 +66,8 @@ WIDTH = 800;
 
 async function reset() {
   console.log("reset()");
-  game = await Game.create(numLevel++);
+  game = await Game.create(numLevel);
+  if (numLevel < 4) numLevel++;
 }
 
 function update() {
