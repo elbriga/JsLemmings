@@ -15,29 +15,25 @@ class Level {
     ]);
 
     this.terrain = terrain;
-    this.terrainMask = mask;
+    this.terrainMask = mask; // TODO :: Classe Mask
 
     this.width = this.terrain.width;
     this.height = this.terrain.height;
-    //terrainMaskImage = pygame.image.load(f'levels/level{number}-mask.png').convert()
-    //terrainMaskImage.set_colorkey((0, 0, 0, 255))
-    //this.terrainMask = pygame.mask.from_surface(terrainMaskImage)
 
-    //this.blockerMask = pygame.mask.Mask((this.width, this.height), False)
-    //this.blockerShape = pygame.mask.Mask((40, 80), True)
+    this.blockerMask  = new Surface(this.width, this.height);
+    this.blockerShape = new Surface(40, 80, true);
 
     this.digWidth = 44;
     this.digHeight = 10;
-    //this.digShape = pygame.mask.Mask((this.digWidth, this.digHeight), True) # TODO : meio-circulo
+    this.digShape = new Surface(this.digWidth, this.digHeight, true); // TODO : meio-circulo
     // criar máscara circular
     this.explosionRadius = 40;
-    //surf = pygame.Surface((this.explosionRadius*2, this.explosionRadius*2), pygame.SRCALPHA)
-    //pygame.draw.circle(surf, (255, 255, 255), (this.explosionRadius, this.explosionRadius), this.explosionRadius)
-    //this.explosionShape = pygame.mask.from_surface(surf)
+    this.explosionShape = new Surface(this.explosionRadius*2, this.explosionRadius*2);
+    this.explosionShape.draw.filled_circle([ this.explosionRadius, this.explosionRadius ], this.explosionRadius, [ 255, 255, 255 ]);
     // Degraus
     this.stepWidth = 16;
     this.stepHeight = 4;
-    //this.stepShape = pygame.mask.Mask((this.stepWidth, this.stepHeight + 2), True)
+    this.stepShape = new Surface(this.stepWidth, this.stepHeight + 2);
   }
 
   // Verifica se um pixel eh solido no mapa ou nos Blocker's
@@ -66,24 +62,24 @@ class Level {
   }
 
   // Corta um pedaco do terreno
-  dig(pos) {
-    const x = Math.floor(pos[0]);
-    const y = Math.floor(pos[1]);
+  dig(x, y) {
     const digRect = new Rect(x, y, this.digWidth, this.digHeight);
-    /*
-    pygame.draw.rect(self.terrain, self.config.backgroundColour, digRect)
-    self.terrainMask.erase(self.digShape, posInt)
-    */
+    this.terrain.draw.filled_rect(digRect, this.config.backgroundColour);
+    this.terrain.reloadImageData(); // Hack!!
+    this.terrainMask.draw.filled_rect(digRect, [ 0,0,0 ]);
+    this.terrainMask.reloadImageData(); // Hack!!
   }
   
   dig_hole(pos) {
       const x = Math.floor(pos[0]);
       const y = Math.floor(pos[1]);
-      // TODO
       // apagar visualmente no terreno
-      //screen.draw.circle(self.terrain, self.config.backgroundColour, (x, y), self.explosionRadius)
+      this.terrain.draw.filled_circle([ x, y ], this.explosionRadius, this.config.backgroundColour);
+      this.terrain.reloadImageData(); // Hack!!
       // remover da máscara do terreno
-      //self.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
+      // TODO :: Classe Mask           this.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
+      this.terrainMask.draw.filled_circle([ x, y ], this.explosionRadius, [ 0,0,0 ]);
+      this.terrainMask.reloadImageData(); // Hack!!
   }
 
   // Adicionar um degrau

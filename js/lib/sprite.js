@@ -4,6 +4,7 @@ class Sprite {
     this.canvas.width  = width;
     this.canvas.height = height;
     this.ctx = this.canvas.getContext("2d");
+    this.draw = Draw.create(this.ctx, this.width, this.height);
   }
 
   get width() {

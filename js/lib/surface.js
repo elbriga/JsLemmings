@@ -23,8 +23,8 @@ class Surface extends Sprite {
     } else if (arguments.length >= 2) {
       imageData = new ImageData(arguments[0], arguments[1]);
       if (arguments[2] === true) {
-        // TODO :: pintar tudo de branco
-        
+        // Pintar tudo de branco
+        new Uint32Array(imageData.data.buffer).fill(0xFFFFFFFF);
       }
     } else {
       throw new TypeError('invalid Surface constructor');
@@ -42,7 +42,11 @@ class Surface extends Sprite {
   // rect = [ x, y, width, height ]
   blit(img, pos, rect = null) {
     super.blit(img, pos, rect);
-    this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
+    this.reloadImageData();
+  }
+
+  reloadImageData() {
+     this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }
 
   /*
