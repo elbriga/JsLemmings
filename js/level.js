@@ -80,19 +80,23 @@ class Level {
       // TODO :: Classe Mask           this.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
       this.terrainMask.draw.filled_circle([ x, y ], this.explosionRadius, [ 0,0,0 ]);
       this.terrainMask.reloadImageData(); // Hack!!
-  }
-
+    }
+    
   // Adicionar um degrau
   add_step(pos, direction) {
-    const x = Math.floor(pos[0]) + (4 * direction);
-    const y = Math.floor(pos[1]) - this.stepHeight;
+    let x = pos[0] + (4 * direction);
+    let y = pos[1] - this.stepHeight;
     if (direction == -1) {
       x -= this.stepWidth;
     }
     // criar visualmente no terreno
-    //pygame.draw.rect(self.terrain, self.config.stepColour, (x, y, self.stepWidth, self.stepHeight))
+    const stepRect = new Rect(x, y, this.stepWidth, this.stepHeight);
+    this.terrain.draw.filled_rect(stepRect, this.config.stepColour);
+    this.terrain.reloadImageData(); // Hack!!
     // criar na máscara do terreno
-    //self.terrainMask.draw(self.stepShape, (x, y))
+    stepRect.height += 2; // Para grudar no terreno! hack?
+    this.terrainMask.draw.filled_rect(stepRect, [ 255,255,255 ]);
+    this.terrainMask.reloadImageData(); // Hack!!
   }
 }
 
