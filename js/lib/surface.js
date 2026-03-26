@@ -12,98 +12,36 @@
  * If possible, you should think of more standard ways to achieve the same
  * result.
  */
-class Surface {
-  /*
-   * Return a padded copy of the Array color to 4 elements.
-   */
-  static _padColorArray(color) {
-    let result = color.slice(0, 4);
-    while (result.length < 3) {
-      result.push(0);
-    }
-    while (result.length < 4) {
-      result.push(255);
-    }
-    return result;
-  }
-
-  /*
-   * Return true if the numbers in the Arrays first and second are equal.
-   */
-  static isColorEqual(first, second) {
-    if (Array.isArray(first) && Array.isArray(second)) {
-      if (first.length <= 0) {
-        return false;
-      }
-      if (second.length <= 0) {
-        return false;
-      }
-
-      let a = Surface._padColorArray(first),
-          b = Surface._padColorArray(second);
-
-      for (let i = 0; i < 4; i++) {
-        if (typeof a[i] !== 'number') {
-          return false;
-        }
-        if (typeof b[i] !== 'number') {
-          return false;
-        }
-        if (a[i] !== b[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
+class Surface extends Sprite {
   constructor() {
-    var init = false;
+    let imageData;
     if (arguments.length == 1) {
-      var imageData = arguments[0];
+      imageData = arguments[0];
       if (!(imageData instanceof ImageData)) {
         throw new TypeError('imageData must be an ImageData.');
       }
-      this.imageData = imageData;
-      init = true;
-    } else if (arguments.length == 2) {
-      this.imageData = new ImageData(arguments[0], arguments[1]);
+    } else if (arguments.length >= 2) {
+      imageData = new ImageData(arguments[0], arguments[1]);
+      if (arguments[2] === true) {
+        // TODO :: pintar tudo de branco
+        
+      }
     } else {
       throw new TypeError('invalid Surface constructor');
     }
-    
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.ctx = this.canvas.getContext("2d");
-    if (init) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.putImageData(this.imageData, 0, 0);
-    }
-  }
 
-  get width() {
-    return this.imageData.width;
-  }
-  get height() {
-    return this.imageData.height;
+    super(imageData.width, imageData.height);
+    this.imageData = imageData;
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.putImageData(this.imageData, 0, 0);
   }
 
   // img = <img>
   // pos = [ x, y ]
   // rect = [ x, y, width, height ]
   blit(img, pos, rect = null) {
-    var source = img.canvas || img;
-    if (rect) {
-      this.ctx.drawImage(
-        source,
-        rect[0], rect[1], rect[2], rect[3], // origem (recorte)
-        pos[0], pos[1], rect[2], rect[3]    // destino
-      );
-    } else {
-      this.ctx.drawImage(source, pos[0], pos[1]);
-    }
+    super.blit(img, pos, rect);
     this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }
 
@@ -149,7 +87,7 @@ class Surface {
   /*
    * Set the color at coordinates (x, y) to the RGBA components in the Array color.
    */
-  setAt(x, y, color) {
+  setAt2(x, y, color) {
     if (typeof x !== 'number') {
       throw new TypeError('x must be a number.');
     }
@@ -187,49 +125,48 @@ class Surface {
     this.ctx.putImageData(this.imageData, 0, 0, x, y, 1, 1);
   }
 
-  scale2x() {
-    const newSurface = new Surface(this.width * 2, this.height * 2);
-
-    newSurface.ctx.imageSmoothingEnabled = false;
-
-    newSurface.ctx.drawImage(
-      this.canvas,
-      0, 0,
-      newSurface.width,
-      newSurface.height
-    );
-
-    newSurface.imageData = newSurface.ctx.getImageData(0, 0, newSurface.width, newSurface.height);
-
-    return newSurface;
+  /*
+   * Return a padded copy of the Array color to 4 elements.
+   */
+  static _padColorArray(color) {
+    let result = color.slice(0, 4);
+    while (result.length < 3) {
+      result.push(0);
+    }
+    while (result.length < 4) {
+      result.push(255);
+    }
+    return result;
   }
 
-  flip(horizontal = false, vertical = false) {
-    const newSurface = new Surface(this.width, this.height);
-    const ctx = newSurface.ctx;
+  /*
+   * Return true if the numbers in the Arrays first and second are equal.
+   */
+  static isColorEqual(first, second) {
+    if (Array.isArray(first) && Array.isArray(second)) {
+      if (first.length <= 0) {
+        return false;
+      }
+      if (second.length <= 0) {
+        return false;
+      }
 
-    ctx.imageSmoothingEnabled = false;
+      let a = Surface._padColorArray(first),
+          b = Surface._padColorArray(second);
 
-    ctx.save();
-
-    // Move origem antes de inverter
-    ctx.translate(
-      horizontal ? this.width : 0,
-      vertical ? this.height : 0
-    );
-
-    // Inverte eixo
-    ctx.scale(
-      horizontal ? -1 : 1,
-      vertical ? -1 : 1
-    );
-
-    ctx.drawImage(this.canvas, 0, 0);
-
-    ctx.restore();
-
-    newSurface.imageData = ctx.getImageData(0, 0, newSurface.width, newSurface.height);
-
-    return newSurface;
+      for (let i = 0; i < 4; i++) {
+        if (typeof a[i] !== 'number') {
+          return false;
+        }
+        if (typeof b[i] !== 'number') {
+          return false;
+        }
+        if (a[i] !== b[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 }

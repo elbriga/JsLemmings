@@ -390,22 +390,22 @@ const screen = (function () {
         context.drawImage(image, 0, 0);
         context.restore();
       }
+      else if (object instanceof Surface) {
+            if (pos instanceof Rect) {
+              x = pos.x;
+              y = pos.y;
+            } else {
+                [x=0, y=0] = pos;
+            }
+            context.save();
+            context.putImageData(object.imageData, x, y);
+            context.restore();
+      }
       else if (object instanceof Sprite) {
         x = pos.x;
         y = pos.y;
         context.save();
         context.drawImage(object.canvas, x, y);
-        context.restore();
-      }
-      else if (object instanceof Surface) {
-        if (pos instanceof Rect) {
-          x = pos.x;
-          y = pos.y;
-        } else {
-          [x=0, y=0] = pos;
-        }
-        context.save();
-        context.putImageData(object.imageData, x, y);
         context.restore();
       }
       else if (typeof object === 'string') {
