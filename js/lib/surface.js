@@ -45,6 +45,11 @@ class Surface extends Sprite {
     this.reloadImageData();
   }
 
+  clear() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    new Uint32Array(this.imageData.data.buffer).fill(0x00000000);
+  }
+
   reloadImageData() {
      this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }

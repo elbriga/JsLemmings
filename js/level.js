@@ -16,49 +16,53 @@ class Level {
 
     this.terrain = terrain;
     this.terrainMask = mask; // TODO :: Classe Mask
+    this.terrainMask.set_colorkey(0, 0, 0);
+    this.terrainMask.reloadImageData(); // Hack!!
 
     this.width = this.terrain.width;
     this.height = this.terrain.height;
 
     this.blockerMask  = new Surface(this.width, this.height);
-    this.blockerShape = new Surface(40, 80, true);
+    //this.blockerShape = new Surface(40, 80, true);
 
     this.digWidth = 44;
     this.digHeight = 10;
-    this.digShape = new Surface(this.digWidth, this.digHeight, true); // TODO : meio-circulo
+    //this.digShape = new Surface(this.digWidth, this.digHeight, true); // TODO : meio-circulo
     // criar máscara circular
     this.explosionRadius = 40;
-    this.explosionShape = new Surface(this.explosionRadius*2, this.explosionRadius*2);
-    this.explosionShape.draw.filled_circle([ this.explosionRadius, this.explosionRadius ], this.explosionRadius, [ 255, 255, 255 ]);
+    //this.explosionShape = new Surface(this.explosionRadius*2, this.explosionRadius*2);
+    //this.explosionShape.draw.filled_circle([ this.explosionRadius, this.explosionRadius ], this.explosionRadius, [ 255, 255, 255 ]);
     // Degraus
     this.stepWidth = 16;
     this.stepHeight = 4;
-    this.stepShape = new Surface(this.stepWidth, this.stepHeight + 2);
+    //this.stepShape = new Surface(this.stepWidth, this.stepHeight + 2);
   }
 
   // Verifica se um pixel eh solido no mapa ou nos Blocker's
   is_solid(x, y) {
     if (x < 0 || x >= this.width || y < 0)
-      return true;
+      return true;  // Bater nos cantos
 
     if (y >= this.height)
       return false; // Permitir cair para baixo
 
     const solid1 = this.terrainMask.getAt(x, y);
-    return solid1[0];
-    return solid1 || this.blockerMask.getAt(posInt);
+    const solid2 = this.blockerMask.getAt(x, y);
+    return solid1[0] || solid2[0];
+    return solid1[0] || this.blockerMask.getAt(x, y)[0];
   }
 
   // Reconstroi a mascara dos lemmings Blockers
   build_blocker_mask(lemmings) {
-    // TODO!
-    return;
-    this.blockerMask.clear()
+    this.blockerMask.clear();
     for (const lem of lemmings) {
       if (lem.stateName == "Blocker" && !lem.dead) {
-        this.blockerMask.draw(self.blockerShape, (lem.rect.x, lem.rect.centery));
+        // this.blockerMask.draw(self.blockerShape, (lem.rect.x, lem.rect.centery));
+        const blockRect = new Rect(lem.rect.x, lem.rect.centery, 40, 80);
+        this.blockerMask.draw.filled_rect(blockRect, [ 255,255,255,255 ]);
       }
     }
+    this.blockerMask.reloadImageData(); // Hack!!
   }
 
   // Corta um pedaco do terreno
@@ -66,7 +70,7 @@ class Level {
     const digRect = new Rect(x, y, this.digWidth, this.digHeight);
     this.terrain.draw.filled_rect(digRect, this.config.backgroundColour);
     this.terrain.reloadImageData(); // Hack!!
-    this.terrainMask.draw.filled_rect(digRect, [ 0,0,0 ]);
+    this.terrainMask.draw.filled_rect(digRect, [ 0,0,0,0 ]);
     this.terrainMask.reloadImageData(); // Hack!!
   }
   
@@ -95,7 +99,7 @@ class Level {
     this.terrain.reloadImageData(); // Hack!!
     // criar na máscara do terreno
     stepRect.height += 2; // Para grudar no terreno! hack?
-    this.terrainMask.draw.filled_rect(stepRect, [ 255,255,255 ]);
+    this.terrainMask.draw.filled_rect(stepRect, [ 255,255,255,255 ]);
     this.terrainMask.reloadImageData(); // Hack!!
   }
 }

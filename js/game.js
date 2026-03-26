@@ -128,25 +128,13 @@ class Game {
   }
 
   draw() {
-    screen.fill(this.level.config.backgroundColour);
-
     // Desenhar o level
-    if (!this.showMask) {
-      //screen.blit('level', [0, 0]);
-      screen.blit(this.level.terrain, [0, 0]);
-    } else {
-/* TODO
-      mask_surface = this.level.terrainMask.to_surface(
-          setcolor=(255, 255, 255, 255),
-          unsetcolor=(0, 0, 0, 0)
-      )
-      this.screen.blit(mask_surface, (0, 0))
-      mask_surface = this.level.blockerMask.to_surface(
-          setcolor=(255, 0, 0, 255),
-          unsetcolor=(0, 0, 0, 0)
-      )
-      this.screen.blit(mask_surface, (0, 0))
-*/
+    screen.fill(this.level.config.backgroundColour);
+    screen.blit(this.level.terrain, [0, 0]);
+    if (this.showMask) {
+    // } else {
+      screen.blit(this.level.blockerMask, [0, 0]);
+      screen.blit(this.level.terrainMask, [0, 0]);
     }
 
     // Desenhar os Objetos
