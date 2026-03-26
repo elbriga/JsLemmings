@@ -9,9 +9,6 @@ body {
   background-color: white;
   color: black;
 }
-.hidden {
-  display: none;
-}
 #original {
   margin-left: 1em;
 }
@@ -20,12 +17,13 @@ body {
 
 <body>
   <script src="js/lib/jsgame0.js"></script>
+  <script src="js/lib/draw.js"></script>
   <script src="js/lib/screen.js"></script>
   <script src="js/lib/surface.js"></script>
   <script src="js/lib/sprite.js"></script>
-  <script src="js/lib/input.js"></script>
-
+  
   <script src="js/events.js"></script>
+  <script src="js/input.js"></script>
   <script src="js/assets.js"></script>
   <script src="js/level.js"></script>
   <script src="js/game.js"></script>
@@ -68,7 +66,7 @@ function on_mouse_move(pos, delta, buttons) {
 }
 
 function on_mouse_down(pos, buttons) {
-  Events.on_mouse_click(game, buttons, pos);
+  Events.onMouseClick(game, buttons, pos);
 }
 
 window.addEventListener('load', async (event) => {
@@ -78,6 +76,10 @@ window.addEventListener('load', async (event) => {
   });
 
   screen.init();
+});
+
+window.addEventListener("keydown", (e) => {
+  Events.onKeyPress(game, e.key);
 });
 </script>
 </body>
