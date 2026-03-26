@@ -60,9 +60,9 @@ class Lemming extends Entity {
     }
 
     is_near(pos, distance) {
-        myRect = pygame.Rect(self.x - distance, self.y - distance, distance * 2, distance * 2)
-        target = pygame.Rect(pos[0] - distance, pos[1] - distance, distance * 2, distance * 2)
-        return myRect.colliderect(target)
+        const myRect = new Rect(self.x - distance, self.y - distance, distance * 2, distance * 2);
+        const target = new Rect(pos[0] - distance, pos[1] - distance, distance * 2, distance * 2);
+        return myRect.colliderect(target);
     }
 
     is_on_floor() {

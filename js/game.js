@@ -37,6 +37,29 @@ class Game {
     this.level = level;
   }
 
+  quit() {
+    if (this.lemmings.length == 0) {
+        this.running = false;
+    } else {
+        this.armaggedon(true);
+    }
+  }
+
+  armaggedon(quit=False) {
+      if (quit)
+          this.quitting = true;
+      for (const l of this.lemmings)
+          l.set_state("Exploder");
+  }
+  
+  new() {
+    this.newLevel = this.level.config.number;
+    if (this.points >= this.level.config.numLemmingsToSave) {
+      // Win!
+      this.newLevel += 1;
+    }
+  }
+
   update() {
     this.hovered = this.get_lemming_near(Input.mouse.x, Input.mouse.y);
 
@@ -59,15 +82,14 @@ class Game {
     for (let lem of this.lemmings) {
       if (!lem.dead) {
         lem.update();
-/* TODO
         // Checar pela saida
-        if lem.is_near(this.level.config.endPosition, 6):
+        if (lem.is_near(this.level.config.endPosition, 6)) {
             this.points += 1;
             lem.die("gone");
-        // Checar se caiu para fora da tela
-        elif lem.rect.y > this.height:
+        } else if (lem.rect.y > this.height) {
+          // Checar se caiu para fora da tela
             lem.die("null");
-*/
+        }
       }
 
       // Animacao
@@ -180,7 +202,33 @@ class Game {
     return best
   }
 
-  load_objects() {
+  toggle_paused() {
+    this.paused = !this.paused;
+  }
 
+  toggle_debug() {
+    this.debug = !this.debug;
+  }
+
+  toggle_show_mask() {
+    this.showMask = !this.showMask;
+  }
+  
+  select_skill(skillName) {
+    if (skillName in this.level.config.skills) {
+      this.selectedSkill = skillName;
+    }
+  }
+  
+  load_objects() {
+    // TODO
+    return;
+    for (const objDef of this.level.config.objects) {
+      // Verificar se existe nos Assets
+      const type = "object_" + objDef["type"];
+      if (type in Assets.animations) {
+        this.entities.append(new Object(this, objDef));
+      }
+    }
   }
 }
