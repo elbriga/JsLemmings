@@ -55,6 +55,13 @@ class Draw {
         const TAB_REPLACEMENT = '    ';
 
         return {
+            /*text(x, y, text, font, color) {
+                context.save();
+                context.font = font;
+                context.fillStyle = color;
+                context.fillText(text, x, y);
+                context.restore();
+            },*/
             line(start, end, color, width = 1, dashArray = null, dashOffset = 0) {
                 if (context == null) {
                     return;

@@ -23,8 +23,8 @@ class Game {
     this.showMask = false;
     this.hovered = undefined;
     this.debug = false;
-    //this.scoreFont = pygame.font.SysFont(None, 40);
-    //this.skillsFont = pygame.font.SysFont(None, 30);
+    this.scoreFont = "20px Arial";
+    this.skillsFont = "30px Arial";
   }
 
   async _load(numLevel) {
@@ -120,7 +120,7 @@ class Game {
           } else {
               // Mostrar a tela de End Level
               const win = this.points >= this.level.config.numLemmingsToSave;
-              this.endScene = Assets.loadImage(`images/end${win ? "Win" : "Lose"}.png`);
+              this.endScene = Assets.images[`end${win ? "Win" : "Lose"}`];
               this.paused = true;
           }
       }
@@ -144,28 +144,33 @@ class Game {
     if (this.hovered) {
       screen.draw.circle([ this.hovered.x, this.hovered.y - this.hovered.rect.height / 4 ], 25, [0, 255, 0, 255], 3);
     }
-/* TODO
-    # Desenhar o score
-    text = this.scoreFont.render(f"Lemmings: {len(this.lemmings)} - Pontos: {this.points} / {this.level.config.numLemmingsToSave}", True, (255, 255, 255))
-    this.screen.blit(text, (10, 10))
-    # Desenhar as Skills
-    i = 0
-    for key, val in this.level.config.skills.items():
-        if ( val <= 0:
-            continue
-        colour = (0, 255, 255) if ( key == this.selectedSkill else (255, 255, 255)
-        text = this.skillsFont.render(f"{key}: {val}", True, colour)
-        this.screen.blit(text, (400, 10 + i * 20))
-        i += 1
-    
-    if ( this.endScene:
-        w, h = this.endScene.get_size()
-        x = this.width // 2 - w // 2
-        y = this.height // 2 - h // 2
-        this.screen.blit(this.endScene, (x, y))
-        b = 5
-        pygame.draw.rect(this.screen, (255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10)
-*/
+    // Desenhar o score
+    let aliveCount = this.lemmings.filter(lem => !lem.dead).length;
+    let scoreText = `Lemmings: ${aliveCount} - Pontos: ${this.points} / ${this.level.config.numLemmingsToSave}`;
+    //screen.draw.text(10, 10, scoreText, this.scoreFont, "black");
+    screen.draw.text(scoreText, { pos: [10, 10], color: "black" });
+
+    // Desenhar as Skills
+    let i = 0
+    for (const key in this.level.config.skills) {
+      let val = this.level.config.skills[key];
+        if ( val <= 0)
+            continue;
+        let color = key == this.selectedSkill ? [0, 155, 155] : [ 0,0,0 ];
+        let text = `${key}: ${val}`;
+        screen.draw.text(text, { pos: [ 400, 10 + i * 20 ], color: color })
+        i += 1;
+    }        
+
+    if (this.endScene) {
+        let w = this.endScene.width;
+        let h = this.endScene.height;
+        let x = this.width / 2 - w / 2;
+        let y = this.height / 2 - h / 2;
+        screen.blit(this.endScene, [ x, y ]);
+        //let b = 5;
+        //screen.draw.rect((255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10);
+    }
   }
 
   get_lemming_near(mx, my, radius=80) {
