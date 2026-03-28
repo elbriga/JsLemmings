@@ -71,7 +71,7 @@ class Level {
     this.blockerMask.clear();
     for (const lem of lemmings) {
       if (lem.stateName == "Blocker" && !lem.dead) {
-        // this.blockerMask.draw(self.blockerShape, (lem.rect.x, lem.rect.centery));
+        // this.blockerMask.draw(this.blockerShape, (lem.rect.x, lem.rect.centery));
         const blockRect = new Rect(lem.rect.x, lem.rect.centery, 40, 80);
         this.blockerMask.draw.filled_rect(blockRect, [255, 255, 255, 255]);
       }
@@ -110,18 +110,18 @@ class LevelConfig {
     // Defaults
     this.number = 0;
     this.skills = {
-      Blocker: 10,
-      Exploder: 10,
-      Digger: 10,
-      Builder: 10,
-      Umbrella: 10,
+      Blocker: 0,
+      Exploder: 0,
+      Digger: 0,
+      Builder: 0,
+      Umbrella: 0,
     };
     this.objects = [];
     this.numLemmings = 10;
     this.numLemmingsToSave = 8;
     this.startPosition = [100, 100];
     this.endPosition = [580, 710];
-    this.backgroundColour = [114, 114, 201, 255];
+    this.backgroundColour = [114, 114, 201, 255]; // nao esta usando mais
     this.releaseRate = 10;
     this.timeLimit = 300;
     this.stepColour = [99, 0, 19, 255];
@@ -129,6 +129,41 @@ class LevelConfig {
 
   async _load(number) {
     this.number = number;
-    // TODO
+
+    const response = await fetch(`levels/level${number}.json`);
+    if (!response.ok) {
+      throw new Error(`Erro ao carregar level ${number}`);
+    }
+
+    const data = await response.json();
+
+    for (const [key, value] of Object.entries(data)) {
+      //for key, value in conf.items():
+      if (key == "skills") {
+        this.loadSkills(value);
+      } else if (key == "objects") {
+        this.objects = value;
+        // Parse de objetos especiais
+        for (const o of this.objects) {
+          if (o.type == "entrance") {
+            this.startPosition = [o.x, o.y];
+          } else if (o.type == "exit") {
+            this.endPosition = [o.x, o.y];
+          }
+        }
+      } else if (Object.hasOwn(this, key)) {
+        this[key] = value;
+      }
+    }
+  }
+
+  loadSkills(skillsJson) {
+    for (const [key, value] of Object.entries(skillsJson)) {
+      if (key in this.skills) {
+        this.skills[key] += value;
+      }
+    }
+    // Remover as skills com valor 0
+    //this.skills = {k: v for k, v in this.skills.items() if v > 0}
   }
 }
