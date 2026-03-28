@@ -8,19 +8,19 @@ class Level {
   async _load(number) {
     this.config = new LevelConfig();
 
-    const [ terrain, bg ] = await Promise.all([
+    const [ terrain, background ] = await Promise.all([
       Assets.loadSurface(`levels/level${number}.png`),
       Assets.loadSurface(`levels/level${number}-bg.png`),
       this.config._load(number),
     ]);
 
     this.terrain = terrain;
-    this.terrainBg = bg;
+    this.background = background;
 
     this.width = this.terrain.width;
     this.height = this.terrain.height;
 
-    this.blockerMask  = new Surface(this.width, this.height);
+    this.blockerMask  = new Surface(this.width, this.height); // TODO :: Classe Mask
     //this.blockerShape = new Surface(40, 80, true);
 
     this.digWidth = 44;
@@ -38,14 +38,12 @@ class Level {
 
   draw(screen, showMask=false) {
     // Desenhar o level
-    //screen.fill(this.config.backgroundColour);
-    screen.blit(this.terrainBg, [0, 0]);
-    screen.blit(this.terrain, [0, 0]);
-
-    if (showMask) {
+    screen.blit(this.background, [0, 0]);
+    if (!showMask) {
+      screen.blit(this.terrain, [0, 0]);
+    } else {
+      screen.blit(this.terrain.toMask(), [0, 0]);
       screen.blit(this.blockerMask, [0, 0]);
-      // TODO :: transformar em Preto e Branco
-      // screen.blitBW(this.terrain, [0, 0]);
     }
   }
 

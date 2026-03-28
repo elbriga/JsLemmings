@@ -61,6 +61,20 @@ class Surface extends Sprite {
     return (x + (y * this.width)) * 4;
   }
 
+  // Converte todos os pixels para branco, menos os transparentes
+  toMask() {
+    const mask = new Surface(this.width, this.height);
+
+    const maskData = new Uint32Array(mask.imageData.data.buffer);
+    const data = new Uint32Array(this.imageData.data.buffer);
+    for (let i = 0; i < data.length; i++) {
+      maskData[i] = (data[i] & 0xFF000000) ? 0xFFFFFFFF : 0x00000000;
+    }
+    mask.ctx.putImageData(mask.imageData, 0, 0);
+
+    return mask;
+  }
+
   /*
    * Return an Array containing the RGBA components of the color at coordinates (x, y).
    */
