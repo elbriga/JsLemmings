@@ -161,7 +161,7 @@ class Game {
     for (const key in this.level.config.skills) {
       let val = this.level.config.skills[key];
       if (val <= 0) continue;
-      let color = key == this.selectedSkill ? [0, 155, 155] : [0, 0, 0];
+      let color = key == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
       let text = `${key}: ${val}`;
       screen.draw.text(text, { pos: [400, 10 + i * 20], color: color });
       i += 1;
