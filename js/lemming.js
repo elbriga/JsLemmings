@@ -90,17 +90,14 @@ class Lemming extends Entity {
     set_state(stateName) {
         const die   = stateName == "Dying";
         const block = stateName == "Blocker"  || this.stateName == "Blocker";
-
+        
+        this.state      = new LemmingState.states[stateName](this);
         this.stateName  = stateName;
         this.stateTimer = 0;
 
-        const stateClass = LemmingState.states[stateName][0];
-        this.state       = new stateClass(this);
         
-        const stateAnim = LemmingState.states[stateName][1];
-        if (stateAnim != "") {
-            const stateAnimNext = LemmingState.states[stateName][2];
-            this.set_animation(stateAnim, stateAnimNext);
+        if (this.state.anim != "") {
+            this.set_animation(this.state.anim, this.state.animNext);
         }
         if (block) {
             // Atualizar mascara de block

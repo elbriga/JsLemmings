@@ -1,8 +1,13 @@
 class LemmingState {
-  static states = {};
+  static states = {}
 
   constructor(lemming) {
     this.lem = lemming;
+    this.anim     = "";
+    this.animNext = "";
+
+    this.ico = "";
+    this.icoFrame = 0;
   }
 
   update(isRecursion=false) {}
@@ -10,9 +15,22 @@ class LemmingState {
   on_change_anim() {}
 }
 
-class Blocker extends LemmingState {}
+class Blocker extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.anim     = "stop";
+    this.ico      = "stop";
+    this.icoFrame = 0;
+  }
+}
 
 class Walker extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.ico      = "walk";
+    this.icoFrame = 0;
+  }
+
   update(isRecursion=false) {
     const lem = this.lem;
 
@@ -47,6 +65,13 @@ class Walker extends LemmingState {
 }
 
 class Faller extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    // Faller nao seta anim automatico
+    this.ico      = "fall";
+    this.icoFrame = 0;
+  }
+
   update(isRecursion=false) {
     const lem = this.lem;
     if (lem.is_on_floor()) {
@@ -75,6 +100,14 @@ class Faller extends LemmingState {
 }
 
 class Floater extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.anim     = "open";
+    this.animNext = "float";
+    this.ico      = "float";
+    this.icoFrame = 0;
+  }
+
   update(isRecursion=false) {
     const lem = this.lem;
     if (lem.is_on_floor()) {
@@ -86,6 +119,13 @@ class Floater extends LemmingState {
 }
 
 class Digger extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.anim     = "dig";
+    this.ico      = "dig";
+    this.icoFrame = 0;
+  }
+
   update(isRecursion=false) {
     const lem = this.lem;
     lem.stateTimer += 1;
@@ -103,6 +143,14 @@ class Digger extends LemmingState {
 }
 
 class Exploder extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.anim     = "boom";
+    this.animNext = "explosion";
+    this.ico      = "boom";
+    this.icoFrame = 0;
+  }
+
   update(isRecursion=false) {
     const lem = this.lem;
     if (!lem.is_on_floor()) {
@@ -119,6 +167,13 @@ class Exploder extends LemmingState {
 }
 
 class Builder extends LemmingState {
+  constructor(lemming) {
+    super(lemming);
+    this.anim     = "build";
+    this.ico      = "build";
+    this.icoFrame = 0;
+  }
+
   on_cycle_anim() {
     const lem = this.lem;
     if (lem.stateTimer >= lem.stepCount) {
@@ -139,12 +194,12 @@ class Builder extends LemmingState {
 class Dying extends LemmingState {}
 
 LemmingState.states = {
-    "Blocker":  [ Blocker,  "stop",  ""          ],
-    "Walker":   [ Walker,   "",      ""          ] ,
-    "Faller":   [ Faller,   "",      ""          ],  // Faller nao seta anim automatico
-    "Floater":  [ Floater,  "open",  "float"     ],
-    "Digger":   [ Digger,   "dig",   ""          ],
-    "Exploder": [ Exploder, "boom",  "explosion" ],
-    "Builder":  [ Builder,  "build", ""          ],
-    "Dying":    [ Dying,    "",      ""          ],  // Usado no lemming.die()
+    Blocker,
+    Walker,
+    Faller,
+    Floater,
+    Digger,
+    Exploder,
+    Builder,
+    Dying,
 }
