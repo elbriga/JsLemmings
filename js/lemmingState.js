@@ -103,8 +103,16 @@ class Digger extends LemmingState {
 }
 
 class Exploder extends LemmingState {
+  update(isRecursion=false) {
+    const lem = this.lem;
+    if (!lem.is_on_floor()) {
+        lem.rect.y += 1;
+    }
+  }
+
   on_change_anim() {
     const lem = this.lem;
+    lem.dead = true;
     lem.game.level.dig_hole(lem.pos);
     lem.rect.x -= 12; // HACK feio! Explosao é maior
   }

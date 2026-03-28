@@ -88,7 +88,7 @@ class Lemming extends Entity {
     }
 
     set_state(stateName) {
-        const die   = stateName == "Exploder" || stateName == "Dying";
+        const die   = stateName == "Dying";
         const block = stateName == "Blocker"  || this.stateName == "Blocker";
 
         this.stateName  = stateName;
