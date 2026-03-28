@@ -8,18 +8,14 @@ class Level {
   async _load(number) {
     this.config = new LevelConfig();
 
-    const [ terrain, mask, bg ] = await Promise.all([
+    const [ terrain, bg ] = await Promise.all([
       Assets.loadSurface(`levels/level${number}.png`),
-      Assets.loadSurface(`levels/level${number}-mask.png`),
       Assets.loadSurface(`levels/level${number}-bg.png`),
       this.config._load(number),
     ]);
 
     this.terrain = terrain;
     this.terrainBg = bg;
-    this.terrainMask = mask; // TODO :: Classe Mask
-    this.terrainMask.set_colorkey(0, 0, 0);
-    this.terrainMask.reloadImageData(); // Hack!!
 
     this.width = this.terrain.width;
     this.height = this.terrain.height;
@@ -48,7 +44,8 @@ class Level {
 
     if (showMask) {
       screen.blit(this.blockerMask, [0, 0]);
-      screen.blit(this.terrainMask, [0, 0]);
+      // TODO :: transformar em Preto e Branco
+      // screen.blitBW(this.terrain, [0, 0]);
     }
   }
 
@@ -60,10 +57,15 @@ class Level {
     if (y >= this.height)
       return false; // Permitir cair para baixo
 
-    const solid1 = this.terrainMask.getAt(x, y);
-    const solid2 = this.blockerMask.getAt(x, y);
-    return solid1[0] || solid2[0];
-    return solid1[0] || this.blockerMask.getAt(x, y)[0];
+    let ground = this.terrain.getAt(x, y);
+    if (ground[3]) // Testar o Alpha da cor do terreno
+      return true;
+
+    let block = this.blockerMask.getAt(x, y);
+    if (block[0] || block[1] || block[2]) // testar pela cor preta
+      return true;
+
+    return false;
   }
 
   // Reconstroi a mascara dos lemmings Blockers
@@ -82,22 +84,13 @@ class Level {
   // Corta um pedaco do terreno
   dig(x, y) {
     const digRect = new Rect(x, y, this.digWidth, this.digHeight);
-    this.terrain.draw.filled_rect(digRect, this.config.backgroundColour);
+    this.terrain.draw.filled_rect(digRect, "erase");
     this.terrain.reloadImageData(); // Hack!!
-    this.terrainMask.draw.filled_rect(digRect, [ 0,0,0,0 ]);
-    this.terrainMask.reloadImageData(); // Hack!!
   }
   
   dig_hole(pos) {
-      const x = Math.floor(pos[0]);
-      const y = Math.floor(pos[1]);
-      // apagar visualmente no terreno
-      this.terrain.draw.filled_circle([ x, y ], this.explosionRadius, "erase");
+      this.terrain.draw.filled_circle(pos, this.explosionRadius, "erase");
       this.terrain.reloadImageData(); // Hack!!
-      // remover da máscara do terreno
-      // TODO :: Classe Mask           this.terrainMask.erase(self.explosionShape, (x - self.explosionRadius, y - self.explosionRadius))
-      this.terrainMask.draw.filled_circle([ x, y ], this.explosionRadius, "erase");
-      this.terrainMask.reloadImageData(); // Hack!!
     }
     
   // Adicionar um degrau
@@ -108,13 +101,9 @@ class Level {
       x -= this.stepWidth;
     }
     // criar visualmente no terreno
-    const stepRect = new Rect(x, y, this.stepWidth, this.stepHeight);
+    const stepRect = new Rect(x, y, this.stepWidth, this.stepHeight + 2); // Hack Feio
     this.terrain.draw.filled_rect(stepRect, this.config.stepColour);
     this.terrain.reloadImageData(); // Hack!!
-    // criar na máscara do terreno
-    stepRect.height += 2; // Para grudar no terreno! hack?
-    this.terrainMask.draw.filled_rect(stepRect, [ 255,255,255,255 ]);
-    this.terrainMask.reloadImageData(); // Hack!!
   }
 }
 

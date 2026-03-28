@@ -261,7 +261,12 @@ class Draw {
                     return;
                 }
                 context.save();
-                context.fillStyle = Draw.parseColor(color);
+                if (color == "erase") {
+                    context.globalCompositeOperation = "destination-out";
+                    context.fillStyle = 'black';
+                } else {
+                    context.fillStyle = Draw.parseColor(color);
+                }
                 context.fillRect(rect.x, rect.y, rect.width, rect.height);
                 context.restore();
             },
