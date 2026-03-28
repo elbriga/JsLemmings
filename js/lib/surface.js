@@ -18,16 +18,16 @@ class Surface extends Sprite {
     if (arguments.length == 1) {
       imageData = arguments[0];
       if (!(imageData instanceof ImageData)) {
-        throw new TypeError('imageData must be an ImageData.');
+        throw new TypeError("imageData must be an ImageData.");
       }
     } else if (arguments.length >= 2) {
       imageData = new ImageData(arguments[0], arguments[1]);
       if (arguments[2] === true) {
         // Pintar tudo de branco
-        new Uint32Array(imageData.data.buffer).fill(0xFFFFFFFF);
+        new Uint32Array(imageData.data.buffer).fill(0xffffffff);
       }
     } else {
-      throw new TypeError('invalid Surface constructor');
+      throw new TypeError("invalid Surface constructor");
     }
 
     super(imageData.width, imageData.height);
@@ -51,14 +51,14 @@ class Surface extends Sprite {
   }
 
   reloadImageData() {
-     this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
+    this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
   }
 
   /*
    * Return the starting index of the pixel data for coordinates (x, y).
    */
   _coordinatesToIndex(x, y) {
-    return (x + (y * this.width)) * 4;
+    return (x + y * this.width) * 4;
   }
 
   // Converte todos os pixels para branco, menos os transparentes
@@ -68,7 +68,7 @@ class Surface extends Sprite {
     const maskData = new Uint32Array(mask.imageData.data.buffer);
     const data = new Uint32Array(this.imageData.data.buffer);
     for (let i = 0; i < data.length; i++) {
-      maskData[i] = (data[i] & 0xFF000000) ? 0xFFFFFFFF : 0x00000000;
+      maskData[i] = data[i] & 0xff000000 ? 0xffffffff : 0x00000000;
     }
     mask.ctx.putImageData(mask.imageData, 0, 0);
 
@@ -79,11 +79,11 @@ class Surface extends Sprite {
    * Return an Array containing the RGBA components of the color at coordinates (x, y).
    */
   getAt(x = 0, y = 0) {
-    if (typeof x !== 'number') {
-      throw new TypeError('x must be a number.');
+    if (typeof x !== "number") {
+      throw new TypeError("x must be a number.");
     }
-    if (typeof y !== 'number') {
-      throw new TypeError('y must be a number.');
+    if (typeof y !== "number") {
+      throw new TypeError("y must be a number.");
     }
 
     if (x < 0) {
@@ -100,9 +100,9 @@ class Surface extends Sprite {
     }
 
     let start = this._coordinatesToIndex(x, y),
-        color = [];
+      color = [];
     for (let i = 0; i < 4; i++) {
-      color.push(this.imageData.data[start+i]);
+      color.push(this.imageData.data[start + i]);
     }
     return color;
   }
@@ -111,14 +111,14 @@ class Surface extends Sprite {
    * Set the color at coordinates (x, y) to the RGBA components in the Array color.
    */
   setAt2(x, y, color) {
-    if (typeof x !== 'number') {
-      throw new TypeError('x must be a number.');
+    if (typeof x !== "number") {
+      throw new TypeError("x must be a number.");
     }
-    if (typeof y !== 'number') {
-      throw new TypeError('y must be a number.');
+    if (typeof y !== "number") {
+      throw new TypeError("y must be a number.");
     }
     if (!Array.isArray(color)) {
-      throw new TypeError('color must be an Array of 3 or 4 integers.');
+      throw new TypeError("color must be an Array of 3 or 4 integers.");
     }
 
     if (x < 0) {
@@ -135,15 +135,15 @@ class Surface extends Sprite {
     }
 
     let start = this._coordinatesToIndex(x, y),
-        newColor = Surface._padColorArray(color),
-        c;
+      newColor = Surface._padColorArray(color),
+      c;
     for (let i = 0; i < 4; i++) {
       c = newColor[i];
-      if (typeof c !== 'number') {
-        throw new TypeError('color must be an Array of 3 or 4 integers.');
+      if (typeof c !== "number") {
+        throw new TypeError("color must be an Array of 3 or 4 integers.");
       }
       // ImageData clamps the value if c is not in [0, 255]
-      this.imageData.data[start+i] = c;
+      this.imageData.data[start + i] = c;
     }
     this.ctx.putImageData(this.imageData, 0, 0, x, y, 1, 1);
   }
@@ -175,13 +175,13 @@ class Surface extends Sprite {
       }
 
       let a = Surface._padColorArray(first),
-          b = Surface._padColorArray(second);
+        b = Surface._padColorArray(second);
 
       for (let i = 0; i < 4; i++) {
-        if (typeof a[i] !== 'number') {
+        if (typeof a[i] !== "number") {
           return false;
         }
-        if (typeof b[i] !== 'number') {
+        if (typeof b[i] !== "number") {
           return false;
         }
         if (a[i] !== b[i]) {

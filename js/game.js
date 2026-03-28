@@ -8,7 +8,7 @@ class Game {
   constructor() {
     this.width = screen.bounds().width;
     this.height = screen.bounds().height;
-    this.running = true;  // Controla o loop principal
+    //this.running = true; // Controla o loop principal
     this.quitting = false;
     this.endScene = undefined;
     this.lemmings = [];
@@ -28,10 +28,10 @@ class Game {
   }
 
   async _load(numLevel) {
-    const [level, assets, objects ] = await Promise.all([
+    const [level, assets, objects] = await Promise.all([
       Level.create(numLevel),
       Assets.load(),
-      this.load_objects()
+      this.load_objects(),
     ]);
 
     this.level = level;
@@ -39,19 +39,17 @@ class Game {
 
   quit() {
     if (this.lemmings.length == 0) {
-        this.running = false;
+      this.running = false;
     } else {
-        this.armaggedon(true);
+      this.armaggedon(true);
     }
   }
 
-  armaggedon(quit=False) {
-      if (quit)
-          this.quitting = true;
-      for (const l of this.lemmings)
-          l.set_state("Exploder");
+  armaggedon(quit = False) {
+    if (quit) this.quitting = true;
+    for (const l of this.lemmings) if (!l.dead) l.set_state("Exploder");
   }
-  
+
   new() {
     this.newLevel = this.level.config.number;
     if (this.points >= this.level.config.numLemmingsToSave) {
@@ -63,8 +61,7 @@ class Game {
   update() {
     this.hovered = this.get_lemming_near(Input.mouse.x, Input.mouse.y);
 
-    if (this.paused)
-      return;
+    if (this.paused) return;
 
     if (this.totLemmings < this.level.config.numLemmings && !this.quitting) {
       this.addTimer += 0.1;
@@ -84,11 +81,11 @@ class Game {
         lem.update();
         // Checar pela saida
         if (lem.is_near(this.level.config.endPosition, 6)) {
-            this.points += 1;
-            lem.die("gone");
+          this.points += 1;
+          lem.die("gone");
         } else if (lem.rect.y > this.height) {
           // Checar se caiu para fora da tela
-            lem.die("null");
+          lem.die("null");
         }
       }
 
@@ -100,29 +97,33 @@ class Game {
         if (lem.frame == 0) {
           lem.on_cycle_anim();
           if (lem.animNext != "") {
-              lem.on_change_anim();
-              lem.set_animation(lem.animNext);
+            lem.on_change_anim();
+            lem.set_animation(lem.animNext);
           } else if (lem.dead) {
-              // Remover os lemmings mortos no final da animacao
-              lem.remove = true;
-              removed = true;
+            // Remover os lemmings mortos no final da animacao
+            lem.remove = true;
+            removed = true;
           }
         }
       }
     }
 
     if (removed) {
-      this.lemmings = this.lemmings.filter(l => !l.remove);
+      this.lemmings = this.lemmings.filter((l) => !l.remove);
       // Verificar se terminou a fase
       if (this.lemmings.length == 0) {
-          if (this.quitting) {
-              this.running = false; // Quebra o loop principal
-          } else {
-              // Mostrar a tela de End Level
-              const win = this.points >= this.level.config.numLemmingsToSave;
-              this.endScene = Assets.images[`end${win ? "Win" : "Lose"}`];
-              this.paused = true;
-          }
+        // if (this.quitting) {
+        //     this.running = false; // Quebra o loop principal
+        // } else {
+        // Mostrar a tela de End Level
+        const win = this.points >= this.level.config.numLemmingsToSave;
+        Assets.loadImage(`images/end${win ? "Win" : "Lose"}.png`).then(
+          (img) => {
+            this.endScene = img;
+          },
+        );
+        this.paused = true;
+        // }
       }
     }
   }
@@ -132,60 +133,64 @@ class Game {
 
     // Desenhar os Objetos
     for (let o of this.entities) {
-        o.draw();
+      o.draw();
     }
 
     // Desenhar os Lemmings
     for (let lem of this.lemmings) {
-        lem.draw();
+      lem.draw();
     }
 
     // Desenhar o selecionado
     if (this.hovered) {
-      screen.draw.circle([ this.hovered.x, this.hovered.y - this.hovered.rect.height / 4 ], 25, [0, 255, 0, 255], 3);
+      screen.draw.circle(
+        [this.hovered.x, this.hovered.y - this.hovered.rect.height / 4],
+        25,
+        [0, 255, 0, 255],
+        3,
+      );
     }
     // Desenhar o score
-    let aliveCount = this.lemmings.filter(lem => !lem.dead).length;
+    let aliveCount = this.lemmings.filter((lem) => !lem.dead).length;
     let scoreText = `Lemmings: ${aliveCount} - Pontos: ${this.points} / ${this.level.config.numLemmingsToSave}`;
     //screen.draw.text(10, 10, scoreText, this.scoreFont, "black");
     screen.draw.text(scoreText, { pos: [10, 10], color: "black" });
 
     // Desenhar as Skills
-    let i = 0
+    let i = 0;
     for (const key in this.level.config.skills) {
       let val = this.level.config.skills[key];
-        if ( val <= 0)
-            continue;
-        let color = key == this.selectedSkill ? [0, 155, 155] : [ 0,0,0 ];
-        let text = `${key}: ${val}`;
-        screen.draw.text(text, { pos: [ 400, 10 + i * 20 ], color: color })
-        i += 1;
-    }        
+      if (val <= 0) continue;
+      let color = key == this.selectedSkill ? [0, 155, 155] : [0, 0, 0];
+      let text = `${key}: ${val}`;
+      screen.draw.text(text, { pos: [400, 10 + i * 20], color: color });
+      i += 1;
+    }
 
     if (this.endScene) {
-        let w = this.endScene.width;
-        let h = this.endScene.height;
-        let x = this.width / 2 - w / 2;
-        let y = this.height / 2 - h / 2;
-        screen.blit(this.endScene, [ x, y ]);
-        //let b = 5;
-        //screen.draw.rect((255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10);
+      let w = this.endScene.width;
+      let h = this.endScene.height;
+      let x = this.width / 2 - w / 2;
+      let y = this.height / 2 - h / 2;
+      screen.blit(this.endScene, [x, y]);
+      //let b = 5;
+      //screen.draw.rect((255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10);
     }
   }
 
-  get_lemming_near(mx, my, radius=80) {
+  get_lemming_near(mx, my, radius = 80) {
     var best = undefined;
     var best_dist = radius * radius;
     for (const lem of this.lemmings) {
-        const dx = lem.x - mx;
-        const dy = lem.y - my;
-        const dist = dx * dx + dy * dy;
-        if (dist < best_dist) {
-            best = lem;
-            best_dist = dist;
-        }
+      const dx = lem.x - mx;
+      const dy = lem.y - my;
+      const dist = dx * dx + dy * dy;
+      if (dist < best_dist) {
+        best = lem;
+        best_dist = dist;
+      }
     }
-    return best
+    return best;
   }
 
   toggle_paused() {
@@ -199,13 +204,13 @@ class Game {
   toggle_show_mask() {
     this.showMask = !this.showMask;
   }
-  
+
   select_skill(skillName) {
     if (skillName in this.level.config.skills) {
       this.selectedSkill = skillName;
     }
   }
-  
+
   load_objects() {
     // TODO
     return;

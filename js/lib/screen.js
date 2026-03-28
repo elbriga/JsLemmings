@@ -9,55 +9,54 @@ const screen = (function () {
    * Return a CSS ID selector, adding "#" as needed.
    */
   function to_CSS_ID(selector) {
-    if (typeof selector !== 'string') {
-      throw new TypeError('selector must be a non-empty CSS selector string.');
+    if (typeof selector !== "string") {
+      throw new TypeError("selector must be a non-empty CSS selector string.");
     }
     if (selector.length <= 0) {
-      throw new RangeError('selector must be a non-empty CSS selector string.');
+      throw new RangeError("selector must be a non-empty CSS selector string.");
     }
 
-    if (selector.startsWith('#')) {
+    if (selector.startsWith("#")) {
       return selector;
     }
-    return '#' + selector;
+    return "#" + selector;
   }
 
   let canvas = null,
-      pauseButton = null,
-      resetButton = null,
-      width = DEFAULT_WIDTH,
-      height = DEFAULT_HEIGHT,
-      context = null,
-      usesKeyboard = false,
-      hasKeyDown = false,
-      hasKeyUp = false,
-      hasDraw = false,
-      hasUpdate = false,
-      running = 0,
-      start;
+    pauseButton = null,
+    resetButton = null,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT,
+    context = null,
+    usesKeyboard = false,
+    hasKeyDown = false,
+    hasKeyUp = false,
+    hasDraw = false,
+    hasUpdate = false,
+    running = 0,
+    start;
 
   /*
    * Event Handlers
    */
   function clickStart(event) {
     // If canvas is null, then clickStart would not have been added
-    canvas.removeEventListener('click', clickStart);
+    canvas.removeEventListener("click", clickStart);
     if (pauseButton != null) {
-      pauseButton.removeEventListener('click', clickStart);
-      pauseButton.addEventListener('click', (event) => {
-        if (event.target.textContent === 'Pause') {
+      pauseButton.removeEventListener("click", clickStart);
+      pauseButton.addEventListener("click", (event) => {
+        if (event.target.textContent === "Pause") {
           screen.stop();
-          event.target.textContent = 'Unpause';
-        }
-        else {
-          event.target.textContent = 'Pause';
+          event.target.textContent = "Unpause";
+        } else {
+          event.target.textContent = "Pause";
           screen.go();
         }
       });
     }
     if (resetButton != null) {
-      resetButton.removeEventListener('click', clickStart);
-      resetButton.addEventListener('click', (event) => {
+      resetButton.removeEventListener("click", clickStart);
+      resetButton.addEventListener("click", (event) => {
         clock._clearQueue();
         Inbetweener._clearQueue();
         for (const n of Object.getOwnPropertyNames(sounds)) {
@@ -66,16 +65,16 @@ const screen = (function () {
         AudioWrapper.inFlight.clear();
         music.stop();
         if (pauseButton != null) {
-          pauseButton.textContent = 'Pause';
+          pauseButton.textContent = "Pause";
         }
-        if (typeof window.reset === 'function') {
+        if (typeof window.reset === "function") {
           window.reset();
         }
         screen.go();
       });
     }
 
-    if (typeof window.reset === 'function') {
+    if (typeof window.reset === "function") {
       // Call reset() here to get around prohibiting autoplay without user interaction
       window.reset();
     }
@@ -101,25 +100,29 @@ const screen = (function () {
   function mousedown(event) {
     // Use getBoundingClientRect() to get the distance relative to viewport
     let box = event.target.getBoundingClientRect(),
-        x = Math.floor(event.clientX - box.left),
-        y = Math.floor(event.clientY - box.top);
+      x = Math.floor(event.clientX - box.left),
+      y = Math.floor(event.clientY - box.top);
     window.on_mouse_down([x, y], event.buttons);
   }
 
   function mouseup(event) {
     // Use getBoundingClientRect() to get the distance relative to viewport
     let box = event.target.getBoundingClientRect(),
-        x = Math.floor(event.clientX - box.left),
-        y = Math.floor(event.clientY - box.top);
+      x = Math.floor(event.clientX - box.left),
+      y = Math.floor(event.clientY - box.top);
     window.on_mouse_up([x, y], event.buttons);
   }
 
   function mousemove(event) {
     // Use getBoundingClientRect() to get the distance relative to viewport
     let box = event.target.getBoundingClientRect(),
-        x = Math.floor(event.clientX - box.left),
-        y = Math.floor(event.clientY - box.top);
-    window.on_mouse_move([x, y], [event.movementX, event.movementY], event.buttons);
+      x = Math.floor(event.clientX - box.left),
+      y = Math.floor(event.clientY - box.top);
+    window.on_mouse_move(
+      [x, y],
+      [event.movementX, event.movementY],
+      event.buttons,
+    );
   }
 
   /*
@@ -179,10 +182,9 @@ const screen = (function () {
       }
     }
 
-
     constructor(audioElement) {
       if (!(audioElement instanceof HTMLMediaElement)) {
-        throw new TypeError('audioElement must be a HTMLMediaElement.');
+        throw new TypeError("audioElement must be a HTMLMediaElement.");
       }
 
       this.audioElement = audioElement;
@@ -197,22 +199,22 @@ const screen = (function () {
       this.volume = 1;
       this.audioElement.volume = this.volume;
 
-      this.audioElement.addEventListener('play', AudioWrapper._soundStart);
-      this.audioElement.addEventListener('ended', AudioWrapper._soundEnd);
+      this.audioElement.addEventListener("play", AudioWrapper._soundStart);
+      this.audioElement.addEventListener("ended", AudioWrapper._soundEnd);
     }
 
     /*
      * Play the sound, but loop it loopCount number of times and fade in over duration seconds.
      */
     play(loopCount = 1, duration = 0) {
-      if (typeof loopCount !== 'number') {
+      if (typeof loopCount !== "number") {
         loopCount = 1;
       }
-      if (typeof duration !== 'number') {
-        throw new TypeError('duration must be a positive number in seconds.');
+      if (typeof duration !== "number") {
+        throw new TypeError("duration must be a positive number in seconds.");
       }
       if (duration < 0) {
-        throw new RangeError('duration must be a positive number in seconds.');
+        throw new RangeError("duration must be a positive number in seconds.");
       }
 
       this.paused = false;
@@ -220,8 +222,7 @@ const screen = (function () {
         this.audioElement.loop = true;
         // Set this.loopCount to 1 so it will be 0 after decrementing
         this.loopCount = 1;
-      }
-      else {
+      } else {
         this.audioElement.loop = false;
         this.loopCount += loopCount;
       }
@@ -235,9 +236,8 @@ const screen = (function () {
       if (duration > 0) {
         // Fade in the audio element over duration seconds
         this.audioElement.volume = 0;
-        animate(this.audioElement, duration, {volume: this.volume}, 'linear');
-      }
-      else {
+        animate(this.audioElement, duration, { volume: this.volume }, "linear");
+      } else {
         this.audioElement.volume = this.volume;
       }
 
@@ -285,11 +285,11 @@ const screen = (function () {
      * Fade out and eventually stop the sound over duration seconds.
      */
     fadeout(duration) {
-      if (typeof duration !== 'number') {
-        throw new TypeError('duration must be a positive number in seconds.');
+      if (typeof duration !== "number") {
+        throw new TypeError("duration must be a positive number in seconds.");
       }
       if (duration <= 0) {
-        throw new RangeError('duration must be a positive number in seconds.');
+        throw new RangeError("duration must be a positive number in seconds.");
       }
       if (this.paused) {
         return;
@@ -297,11 +297,13 @@ const screen = (function () {
 
       this.audioElement.loop = false;
       this.loopCount = 0;
-      animate(this.audioElement, duration, {volume: 0}, 'linear', () => this.stop());
+      animate(this.audioElement, duration, { volume: 0 }, "linear", () =>
+        this.stop(),
+      );
     }
 
     _play_again() {
-      return ((!this.paused) && (this.loopCount > 0));
+      return !this.paused && this.loopCount > 0;
     }
 
     /*
@@ -315,8 +317,10 @@ const screen = (function () {
      * Set the audio volume between 0 (meaning silent) and 1 (meaning full volume).
      */
     set_volume(v) {
-      if (typeof v !== 'number') {
-        throw new TypeError('volume must be a number between 0 (meaning silent) and 1 (meaning full volume).');
+      if (typeof v !== "number") {
+        throw new TypeError(
+          "volume must be a number between 0 (meaning silent) and 1 (meaning full volume).",
+        );
       }
       this.volume = Math.max(0, Math.min(v, 1));
       this.audioElement.volume = this.volume;
@@ -324,7 +328,7 @@ const screen = (function () {
   }
 
   return {
-// TODO :: Usar Surface aqui e migrar esses metodos para la??
+    // TODO :: Usar Surface aqui e migrar esses metodos para la??
     // context is null here!    draw: Draw.create(context, width, height),
 
     /*
@@ -337,7 +341,7 @@ const screen = (function () {
     /*
      * Clear the screen to black.
      */
-    clear(color = 'black') {
+    clear(color = "black") {
       if (context == null) {
         return;
       }
@@ -357,8 +361,7 @@ const screen = (function () {
         gradient.addColorStop(0, Draw.parseColor(color));
         gradient.addColorStop(1, Draw.parseColor(gcolor));
         context.fillStyle = gradient;
-      }
-      else {
+      } else {
         context.fillStyle = Draw.parseColor(color);
       }
       context.fillRect(0, 0, width, height);
@@ -372,84 +375,74 @@ const screen = (function () {
         return;
       }
 
-      let x, y, image;
       if (object instanceof Actor) {
-        [x=0, y=0] = pos;
+        let x, y, image;
+        [x = 0, y = 0] = pos;
         image = images[object.name];
         context.save();
-        if (typeof object.opacity === 'number') {
+        if (typeof object.opacity === "number") {
           context.globalAlpha = Math.max(0, Math.min(object.opacity, 1));
         }
         // Move the origin to the anchor so we can rotate
         context.translate(...object.pos);
         // Canvas rotates clockwise but Pygame Zero rotates counterclockwise (anticlockwise)
-        context.rotate(-(object.angle % 360) * Math.PI / 180);
+        context.rotate((-(object.angle % 360) * Math.PI) / 180);
         // Move the origin to the topleft to draw the image
         // x and y contain pixel offsets from the topleft corner to the anchor
         context.translate(-x, -y);
         context.drawImage(image, 0, 0);
         context.restore();
-      }
-      /* NAO FUNCIONA BEM COM TRANSPARENCIAS
-      else if (object instanceof Surface) {
-            if (pos instanceof Rect) {
-              x = pos.x;
-              y = pos.y;
-            } else {
-                [x=0, y=0] = pos;
-            }
-            context.save();
-            context.putImageData(object.imageData, x, y);
-            context.restore();
-      }*/
-      else if (object instanceof Sprite) {
-        if (pos instanceof Rect) {
-            x = pos.x;
-            y = pos.y;
-        } else {
-            [x=0, y=0] = pos;
+      } else {
+        if (typeof object === "string") image = images[object];
+        else if (object instanceof Sprite) image = object.canvas;
+        else if (object instanceof HTMLImageElement) image = object;
+
+        if (!image) {
+          throw new TypeError("Unrecognized object to blit.");
         }
-        context.save();
-        context.drawImage(object.canvas, x, y);
-        context.restore();
-      }
-      else if (typeof object === 'string') {
-        if (!(object in images)) {
-          throw new RangeError(`Unknown image "${ object }".`);
-        }
-        image = images[object];
+
         context.save();
         if (pos instanceof Rect) {
           // Support scaling and tilesets when Rect objects are passed as arguments
           if (target instanceof Rect) {
-            context.drawImage(image, pos.x, pos.y, pos.width, pos.height,
-                              target.x, target.y, target.width, target.height);
-          }
-          else {
+            context.drawImage(
+              image,
+              pos.x,
+              pos.y,
+              pos.width,
+              pos.height,
+              target.x,
+              target.y,
+              target.width,
+              target.height,
+            );
+          } else {
             context.drawImage(image, pos.x, pos.y, pos.width, pos.height);
           }
-        }
-        else {
-          [x=0, y=0] = pos;
+        } else {
+          [x = 0, y = 0] = pos;
           context.drawImage(image, x, y);
         }
         context.restore();
-      }
-      else {
-        // Otherwise, object is not recognized
-        throw new TypeError('Unrecognized object to blit.');
       }
     },
 
     /*
      * Setup the global objects images, sounds, music, and screen.
      */
-    init(canvasID = '#screen', resetID = '#reset', pauseID = '#pause', imagesID = '#imageLoader', soundsID = '#soundLoader', musicID = '#musicLoader') {
+    init(
+      canvasID = "#screen",
+      resetID = "#reset",
+      pauseID = "#pause",
+      imagesID = "#imageLoader",
+      soundsID = "#soundLoader",
+      musicID = "#musicLoader",
+    ) {
       let element = document.querySelector(to_CSS_ID(imagesID)),
-          name;
+        name;
       if (element != null) {
         // Populate the images global object
-        for (let e of element.querySelectorAll('img')) {
+        for (let e of element.querySelectorAll("img")) {
           name = e.dataset.name.trim();
           images[name] = e;
         }
@@ -458,7 +451,7 @@ const screen = (function () {
       // Populate the sounds global object
       element = document.querySelector(to_CSS_ID(soundsID));
       if (element != null) {
-        for (let e of element.querySelectorAll('audio')) {
+        for (let e of element.querySelectorAll("audio")) {
           name = e.dataset.name.trim();
           sounds[name] = new AudioWrapper(e);
         }
@@ -470,9 +463,9 @@ const screen = (function () {
         music._load(element);
       }
 
-      if (window.TITLE && (typeof window.TITLE === 'string')) {
-        document.querySelector('title').textContent = window.TITLE;
-        document.querySelector('h1').textContent = window.TITLE;
+      if (window.TITLE && typeof window.TITLE === "string") {
+        document.querySelector("title").textContent = window.TITLE;
+        document.querySelector("h1").textContent = window.TITLE;
       }
 
       canvas = document.querySelector(to_CSS_ID(canvasID));
@@ -484,32 +477,30 @@ const screen = (function () {
         // If not the canvas element or Canvas API not supported
         return;
       }
-      if (window.WIDTH && (typeof window.WIDTH === 'number')) {
+      if (window.WIDTH && typeof window.WIDTH === "number") {
         width = canvas.width = window.WIDTH;
-      }
-      else {
+      } else {
         width = canvas.width = DEFAULT_WIDTH;
       }
-      if (window.HEIGHT && (typeof window.HEIGHT === 'number')) {
+      if (window.HEIGHT && typeof window.HEIGHT === "number") {
         height = canvas.height = window.HEIGHT;
-      }
-      else {
+      } else {
         height = canvas.height = DEFAULT_HEIGHT;
       }
 
-      context = canvas.getContext('2d');
-      hasKeyDown = (typeof window.on_key_down === 'function');
-      hasKeyUp = (typeof window.on_key_up === 'function');
-      hasDraw = (typeof window.draw === 'function');
-      hasUpdate = (typeof window.update === 'function');
+      context = canvas.getContext("2d");
+      hasKeyDown = typeof window.on_key_down === "function";
+      hasKeyUp = typeof window.on_key_up === "function";
+      hasDraw = typeof window.draw === "function";
+      hasUpdate = typeof window.update === "function";
 
       /*
        * Inspect all script blocks for code that uses the keyboard global.
        *
        * This can be fooled but then you are just dooming yourself.
        */
-      for (let e of document.querySelectorAll('script')) {
-        if (e.textContent.includes('keyboard[')) {
+      for (let e of document.querySelectorAll("script")) {
+        if (e.textContent.includes("keyboard[")) {
           usesKeyboard = true;
           break;
         }
@@ -519,14 +510,14 @@ const screen = (function () {
       screen.draw._playButton();
 
       // Add listeners to the HTML user interface controls
-      canvas.addEventListener('click', clickStart);
+      canvas.addEventListener("click", clickStart);
       pauseButton = document.querySelector(to_CSS_ID(pauseID));
       if (pauseButton != null) {
-        pauseButton.addEventListener('click', clickStart);
+        pauseButton.addEventListener("click", clickStart);
       }
       resetButton = document.querySelector(to_CSS_ID(resetID));
       if (resetButton != null) {
-        resetButton.addEventListener('click', clickStart);
+        resetButton.addEventListener("click", clickStart);
       }
     },
 
@@ -540,19 +531,19 @@ const screen = (function () {
 
       if (usesKeyboard || hasKeyDown || hasKeyUp) {
         // Only add KeyboardEvent listeners if necessary because it is on window
-        window.addEventListener('keydown', keydown, true);
-        window.addEventListener('keyup', keyup, true);
+        window.addEventListener("keydown", keydown, true);
+        window.addEventListener("keyup", keyup, true);
       }
 
       if (canvas != null) {
-        if (typeof window.on_mouse_down === 'function') {
-          canvas.addEventListener('mousedown', mousedown);
+        if (typeof window.on_mouse_down === "function") {
+          canvas.addEventListener("mousedown", mousedown);
         }
-        if (typeof window.on_mouse_up === 'function') {
-          canvas.addEventListener('mouseup', mouseup);
+        if (typeof window.on_mouse_up === "function") {
+          canvas.addEventListener("mouseup", mouseup);
         }
-        if (typeof window.on_mouse_move === 'function') {
-          canvas.addEventListener('mousemove', mousemove);
+        if (typeof window.on_mouse_move === "function") {
+          canvas.addEventListener("mousemove", mousemove);
         }
       }
 
@@ -586,12 +577,12 @@ const screen = (function () {
       music.pause();
 
       // Remove event listeners
-      window.removeEventListener('keydown', keydown, true);
-      window.removeEventListener('keyup', keyup, true);
+      window.removeEventListener("keydown", keydown, true);
+      window.removeEventListener("keyup", keyup, true);
       if (canvas != null) {
-        canvas.removeEventListener('mousedown', mousedown);
-        canvas.removeEventListener('mouseup', mouseup);
-        canvas.removeEventListener('mousemove', mousemove);
+        canvas.removeEventListener("mousedown", mousedown);
+        canvas.removeEventListener("mouseup", mouseup);
+        canvas.removeEventListener("mousemove", mousemove);
       }
     },
 
@@ -606,16 +597,15 @@ const screen = (function () {
       }
 
       let x = 0,
-          y = 0,
-          w = width,
-          h = height;
+        y = 0,
+        w = width,
+        h = height;
       if (arguments.length < 4) {
-        [w=width, h=height] = arguments;
-      }
-      else {
-        [x=0, y=0, w=width, h=height] = arguments;
+        [w = width, h = height] = arguments;
+      } else {
+        [x = 0, y = 0, w = width, h = height] = arguments;
       }
       return new Surface(context.getImageData(x, y, w, h));
-    }
-  }
+    },
+  };
 })();

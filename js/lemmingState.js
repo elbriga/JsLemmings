@@ -1,16 +1,16 @@
 class LemmingState {
-  static states = {}
+  static states = {};
 
   constructor(lemming) {
     this.lem = lemming;
-    this.anim     = "";
+    this.anim = "";
     this.animNext = "";
 
     this.ico = "";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {}
+  update(isRecursion = false) {}
   on_cycle_anim() {}
   on_change_anim() {}
 }
@@ -18,8 +18,8 @@ class LemmingState {
 class Blocker extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.anim     = "stop";
-    this.ico      = "stop";
+    this.anim = "stop";
+    this.ico = "stop";
     this.icoFrame = 0;
   }
 }
@@ -27,11 +27,11 @@ class Blocker extends LemmingState {
 class Walker extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.ico      = "walk";
+    this.ico = "walk";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {
+  update(isRecursion = false) {
     const lem = this.lem;
 
     if (lem.falling > lem.game.minHeightToDie) {
@@ -42,8 +42,7 @@ class Walker extends LemmingState {
 
     if (!lem.is_on_floor()) {
       lem.set_state("Faller");
-      if (!isRecursion)
-        lem.update(true);
+      if (!isRecursion) lem.update(true);
       return;
     }
 
@@ -52,15 +51,14 @@ class Walker extends LemmingState {
       lem.direction *= -1;
       return;
     }
-    
+
     // Andar
     lem.rect.x += lem.direction;
     // Subir o terreno se preciso
     lem.rect.y -= height;
 
     lem.stateTimer += 1;
-    if (lem.stateTimer == 10)
-        lem.set_animation("walk");
+    if (lem.stateTimer == 10) lem.set_animation("walk");
   }
 }
 
@@ -68,51 +66,45 @@ class Faller extends LemmingState {
   constructor(lemming) {
     super(lemming);
     // Faller nao seta anim automatico
-    this.ico      = "fall";
+    this.ico = "fall";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {
+  update(isRecursion = false) {
     const lem = this.lem;
     if (lem.is_on_floor()) {
-        lem.set_state("Walker");
-        if (!isRecursion)
-            lem.update(true);
-        return;
+      lem.set_state("Walker");
+      if (!isRecursion) lem.update(true);
+      return;
     }
 
     var delta;
-    if (lem.falling > 100)
-        delta = 4;
-    else if (lem.falling > 50)
-        delta = 3;
-    else
-        delta = 2;
-    lem.rect.y  += delta;
+    if (lem.falling > 100) delta = 4;
+    else if (lem.falling > 50) delta = 3;
+    else delta = 2;
+    lem.rect.y += delta;
     lem.falling += delta;
 
     if (lem.falling > 100) {
-        if (lem.hasUmbrella)
-            lem.set_state("Floater");
-    } else if (lem.falling > 20 && lem.falling < 26)
-        lem.set_animation("fall");
+      if (lem.hasUmbrella) lem.set_state("Floater");
+    } else if (lem.falling > 20 && lem.falling < 26) lem.set_animation("fall");
   }
 }
 
 class Floater extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.anim     = "open";
+    this.anim = "open";
     this.animNext = "float";
-    this.ico      = "float";
+    this.ico = "float";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {
+  update(isRecursion = false) {
     const lem = this.lem;
     if (lem.is_on_floor()) {
-        lem.set_state("Walker");
-        return;
+      lem.set_state("Walker");
+      return;
     }
     lem.rect.y += 1;
   }
@@ -121,12 +113,12 @@ class Floater extends LemmingState {
 class Digger extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.anim     = "dig";
-    this.ico      = "dig";
+    this.anim = "dig";
+    this.ico = "dig";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {
+  update(isRecursion = false) {
     const lem = this.lem;
     lem.stateTimer += 1;
     if (lem.stateTimer > 20) {
@@ -145,16 +137,16 @@ class Digger extends LemmingState {
 class Exploder extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.anim     = "boom";
+    this.anim = "boom";
     this.animNext = "explosion";
-    this.ico      = "boom";
+    this.ico = "boom";
     this.icoFrame = 0;
   }
 
-  update(isRecursion=false) {
+  update(isRecursion = false) {
     const lem = this.lem;
     if (!lem.is_on_floor()) {
-        lem.rect.y += 1;
+      lem.rect.y += 1;
     }
   }
 
@@ -169,8 +161,8 @@ class Exploder extends LemmingState {
 class Builder extends LemmingState {
   constructor(lemming) {
     super(lemming);
-    this.anim     = "build";
-    this.ico      = "build";
+    this.anim = "build";
+    this.ico = "build";
     this.icoFrame = 0;
   }
 
@@ -179,13 +171,12 @@ class Builder extends LemmingState {
     if (lem.stateTimer >= lem.stepCount) {
       lem.set_state("Walker");
       return;
-    }
-    else if (lem.stateTimer >= lem.stepCount - 1) {
-        lem.set_animation("done")
+    } else if (lem.stateTimer >= lem.stepCount - 1) {
+      lem.set_animation("done");
     }
     // Novo degrau
     lem.game.level.add_step(lem.pos, lem.direction);
-    lem.rect.x += (4 * lem.direction);
+    lem.rect.x += 4 * lem.direction;
     lem.rect.y -= 4;
     lem.stateTimer += 1; // Contar os degraus
   }
@@ -194,12 +185,12 @@ class Builder extends LemmingState {
 class Dying extends LemmingState {}
 
 LemmingState.states = {
-    Blocker,
-    Walker,
-    Faller,
-    Floater,
-    Digger,
-    Exploder,
-    Builder,
-    Dying,
-}
+  Blocker,
+  Walker,
+  Faller,
+  Floater,
+  Digger,
+  Exploder,
+  Builder,
+  Dying,
+};

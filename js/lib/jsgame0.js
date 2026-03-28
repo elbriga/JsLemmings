@@ -14,7 +14,7 @@ const mouse = Object.freeze({
   MIDDLE: 4,
   RIGHT: 2,
   WHEEL_UP: 8,
-  WHEEL_DOWN: 16
+  WHEEL_DOWN: 16,
 });
 
 /*
@@ -34,14 +34,14 @@ const clock = (function () {
      * Schedule callback to be called, at delay seconds from now.
      */
     schedule(callback, delay) {
-      if (typeof callback !== 'function') {
-        throw new TypeError('callback must be a function.');
+      if (typeof callback !== "function") {
+        throw new TypeError("callback must be a function.");
       }
-      if (typeof delay !== 'number') {
-        throw new TypeError('delay must be a positive number in seconds.');
+      if (typeof delay !== "number") {
+        throw new TypeError("delay must be a positive number in seconds.");
       }
       if (delay <= 0) {
-        throw new RangeError('delay must be a positive number in seconds.');
+        throw new RangeError("delay must be a positive number in seconds.");
       }
       queue.push([callback, delay, 0]);
     },
@@ -58,14 +58,14 @@ const clock = (function () {
      * Schedule callback to be called repeatedly with interval seconds between calls.
      */
     schedule_interval(callback, interval) {
-      if (typeof callback !== 'function') {
-        throw new TypeError('callback must be a function.');
+      if (typeof callback !== "function") {
+        throw new TypeError("callback must be a function.");
       }
-      if (typeof interval !== 'number') {
-        throw new TypeError('interval must be a positive number in seconds.');
+      if (typeof interval !== "number") {
+        throw new TypeError("interval must be a positive number in seconds.");
       }
       if (interval <= 0) {
-        throw new RangeError('interval must be a positive number in seconds.');
+        throw new RangeError("interval must be a positive number in seconds.");
       }
       queue.push([callback, interval, interval]);
     },
@@ -74,10 +74,10 @@ const clock = (function () {
      * Unschedule the given callback.
      */
     unschedule(callback) {
-      if (typeof callback !== 'function') {
-        throw new TypeError('callback must be a function.');
+      if (typeof callback !== "function") {
+        throw new TypeError("callback must be a function.");
       }
-      queue = queue.filter((q) => (q[0] !== callback));
+      queue = queue.filter((q) => q[0] !== callback);
     },
 
     _clearQueue() {
@@ -96,8 +96,8 @@ const clock = (function () {
      */
     _updateQueue(dt) {
       let due = [],
-          result = [],
-          newETA;
+        result = [],
+        newETA;
       for (let [callback, eta, next] of queue) {
         newETA = eta - dt;
         if (newETA <= 0) {
@@ -105,8 +105,7 @@ const clock = (function () {
           if (next > 0) {
             result.push([callback, next, next]);
           }
-        }
-        else {
+        } else {
           result.push([callback, newETA, next]);
         }
       }
@@ -117,8 +116,8 @@ const clock = (function () {
       for (let callback of due) {
         callback();
       }
-    }
-  }
+    },
+  };
 })();
 
 const images = {};
@@ -132,10 +131,10 @@ const music = (function () {
   const TRACK_MAP = new Map();
 
   let current = null,
-      hasMusicHook = false,
-      next = null,
-      paused = false,
-      volume = 1;
+    hasMusicHook = false,
+    next = null,
+    paused = false,
+    volume = 1;
 
   /*
    * JavaScript callback for when the end of the media is reached.
@@ -144,7 +143,7 @@ const music = (function () {
     if (hasMusicHook) {
       window.on_music_end();
     }
-    if ((current != null) && (!current.loop)) {
+    if (current != null && !current.loop) {
       if (next != null) {
         music._play(next, false);
         next = null;
@@ -154,11 +153,11 @@ const music = (function () {
 
   return {
     _load(loaderElement) {
-      for (let e of loaderElement.querySelectorAll('audio')) {
+      for (let e of loaderElement.querySelectorAll("audio")) {
         TRACK_MAP.set(e.dataset.name.trim(), e);
-        e.addEventListener('ended', deejay);
+        e.addEventListener("ended", deejay);
       }
-      hasMusicHook = (typeof window.on_music_end === 'function');
+      hasMusicHook = typeof window.on_music_end === "function";
     },
 
     _play(name, loop = false) {
@@ -217,11 +216,15 @@ const music = (function () {
     },
 
     set_pos(pos) {
-      if (typeof pos !== 'number') {
-        throw new TypeError('pos must be a number between 0 and the duration of the track.');
+      if (typeof pos !== "number") {
+        throw new TypeError(
+          "pos must be a number between 0 and the duration of the track.",
+        );
       }
       if (pos < 0) {
-        throw new RangeError('pos must be a number between 0 and the duration of the track.');
+        throw new RangeError(
+          "pos must be a number between 0 and the duration of the track.",
+        );
       }
       if (current != null) {
         current.currentTime = Math.max(0, Math.min(pos, current.duration));
@@ -276,23 +279,23 @@ const music = (function () {
      * False otherwise.
      */
     is_playing() {
-      return ((current != null) && (!paused));
+      return current != null && !paused;
     },
 
     /*
      * Fade out and eventually stop the current music playback over duration seconds.
      */
     fadeout(duration) {
-      if (typeof duration !== 'number') {
-        throw new TypeError('duration must be a positive number in seconds.');
+      if (typeof duration !== "number") {
+        throw new TypeError("duration must be a positive number in seconds.");
       }
       if (duration <= 0) {
-        throw new RangeError('duration must be a positive number in seconds.');
+        throw new RangeError("duration must be a positive number in seconds.");
       }
 
       if (music.is_playing()) {
         current.loop = false;
-        animate(current, duration, {volume: 0}, 'linear', () => music.stop());
+        animate(current, duration, { volume: 0 }, "linear", () => music.stop());
       }
     },
 
@@ -309,15 +312,17 @@ const music = (function () {
      * This takes a number between 0 (meaning silent) and 1 (meaning full volume).
      */
     set_volume(v) {
-      if (typeof v !== 'number') {
-        throw new TypeError('volume must be a number between 0 (meaning silent) and 1 (meaning full volume).');
+      if (typeof v !== "number") {
+        throw new TypeError(
+          "volume must be a number between 0 (meaning silent) and 1 (meaning full volume).",
+        );
       }
       volume = Math.max(0, Math.min(v, 1));
       if (current != null) {
         current.volume = volume;
       }
-    }
-  }
+    },
+  };
 })();
 
 const tone = (function () {
@@ -357,21 +362,21 @@ const tone = (function () {
     const TWELFTH_ROOT = Math.pow(2, 1 / 12);
 
     for (let [note, value] of [
-      ['a', 0],
-      ['b', 2],
-      ['c', -9],
-      ['d', -7],
-      ['e', -5],
-      ['f', -4],
-      ['g', -2]]) {
-      for (let accidental of ['', 'b', '#']) {
+      ["a", 0],
+      ["b", 2],
+      ["c", -9],
+      ["d", -7],
+      ["e", -5],
+      ["f", -4],
+      ["g", -2],
+    ]) {
+      for (let accidental of ["", "b", "#"]) {
         for (let octave = 0; octave < 9; octave++) {
           let key = note + accidental + octave,
-              frequency = value;
-          if (accidental === 'b') {
+            frequency = value;
+          if (accidental === "b") {
             frequency -= 1;
-          }
-          else if (accidental === '#') {
+          } else if (accidental === "#") {
             frequency += 1;
           }
           frequency += (octave - 4) * 12;
@@ -395,30 +400,32 @@ const tone = (function () {
      * note is a string and duration is a positive number in seconds.
      */
     play(note, duration) {
-      if (typeof note !== 'string') {
-        throw new TypeError('note must be a string. Notes are A-G, are either normal, flat (b) or sharp (#) and of octave 0-8.');
+      if (typeof note !== "string") {
+        throw new TypeError(
+          "note must be a string. Notes are A-G, are either normal, flat (b) or sharp (#) and of octave 0-8.",
+        );
       }
-      if (typeof duration !== 'number') {
-        throw new TypeError('duration must be a positive number in seconds.');
+      if (typeof duration !== "number") {
+        throw new TypeError("duration must be a positive number in seconds.");
       }
       if (duration <= 0) {
-        throw new RangeError('duration must be a positive number in seconds.');
+        throw new RangeError("duration must be a positive number in seconds.");
       }
 
       populateNotes();
       let cleaned = note.trim().toLowerCase(),
-          envelope = [],
-          gain, oscillator;
+        envelope = [],
+        gain,
+        oscillator;
       if (NOTE_MAP.has(cleaned)) {
         // Create the Attack Decay Sustain Release (ADSR) envelope
-        if (duration < (ATTACK + DECAY)) {
+        if (duration < ATTACK + DECAY) {
           // If duration is shorter than the Attack and Decay stages,
           // then there is no Decay stage
           envelope.push([1, duration * 0.1]);
           envelope.push([0.9, duration]);
           envelope.push([0, duration + RELEASE]);
-        }
-        else {
+        } else {
           envelope.push([1, ATTACK]);
           envelope.push([0.7, ATTACK + DECAY]);
           envelope.push([0.7, duration]);
@@ -430,22 +437,26 @@ const tone = (function () {
         gain.gain.setValueAtTime(0, context.currentTime);
         for (let [value, offset] of envelope) {
           // Pygame Zero linearly interpolates the samples so we do the same
-          gain.gain.linearRampToValueAtTime(value, context.currentTime + offset);
+          gain.gain.linearRampToValueAtTime(
+            value,
+            context.currentTime + offset,
+          );
         }
 
         // Create the oscillator to generate the actual tone
         oscillator = context.createOscillator();
         oscillator.connect(gain);
-        oscillator.type = 'sine';
+        oscillator.type = "sine";
         oscillator.frequency.value = NOTE_MAP.get(cleaned);
         oscillator.start(context.currentTime);
         oscillator.stop(context.currentTime + duration + RELEASE);
+      } else {
+        throw new RangeError(
+          `Unrecognized note "${note}". Notes are A-G, are either normal, flat (b) or sharp (#) and of octave 0-8.`,
+        );
       }
-      else {
-        throw new RangeError(`Unrecognized note "${ note }". Notes are A-G, are either normal, flat (b) or sharp (#) and of octave 0-8.`);
-      }
-    }
-  }
+    },
+  };
 })();
 
 /*
@@ -456,51 +467,49 @@ class Rect {
     let x, y, width, height;
     if (arguments.length < 1) {
       // If there are not enough arguments
-      throw new Error('Not enough arguments.');
+      throw new Error("Not enough arguments.");
     }
     if (arguments.length < 2) {
-      if (typeof arguments[0] !== 'object') {
-        throw new Error('Not enough arguments.');
+      if (typeof arguments[0] !== "object") {
+        throw new Error("Not enough arguments.");
       }
       if (Array.isArray(arguments[0])) {
-        [x=0, y=0, width=0, height=0] = arguments[0];
+        [x = 0, y = 0, width = 0, height = 0] = arguments[0];
+      } else {
+        ({ x = 0, y = 0, width = 0, height = 0 } = arguments[0]);
       }
-      else {
-        ({x=0, y=0, width=0, height=0} = arguments[0]);
-      }
-    }
-    else if (arguments.length < 4) {
-      if ((typeof arguments[0] !== 'object') || (typeof arguments[1] !== 'object')) {
-        throw new Error('Not enough arguments.');
+    } else if (arguments.length < 4) {
+      if (
+        typeof arguments[0] !== "object" ||
+        typeof arguments[1] !== "object"
+      ) {
+        throw new Error("Not enough arguments.");
       }
       if (Array.isArray(arguments[0])) {
-        [x=0, y=0] = arguments[0];
-      }
-      else {
-        ({x=0, y=0} = arguments[0]);
+        [x = 0, y = 0] = arguments[0];
+      } else {
+        ({ x = 0, y = 0 } = arguments[0]);
       }
       if (Array.isArray(arguments[1])) {
-        [width=0, height=0] = arguments[1];
+        [width = 0, height = 0] = arguments[1];
+      } else {
+        ({ width = 0, height = 0 } = arguments[1]);
       }
-      else {
-        ({width=0, height=0} = arguments[1]);
-      }
-    }
-    else {
-      [x=0, y=0, width=0, height=0] = arguments;
+    } else {
+      [x = 0, y = 0, width = 0, height = 0] = arguments;
     }
 
-    if (typeof x !== 'number') {
-      throw new TypeError('x must be a number.');
+    if (typeof x !== "number") {
+      throw new TypeError("x must be a number.");
     }
-    if (typeof y !== 'number') {
-      throw new TypeError('y must be a number.');
+    if (typeof y !== "number") {
+      throw new TypeError("y must be a number.");
     }
-    if (typeof width !== 'number') {
-      throw new TypeError('width must be a number.');
+    if (typeof width !== "number") {
+      throw new TypeError("width must be a number.");
     }
-    if (typeof height !== 'number') {
-      throw new TypeError('height must be a number.');
+    if (typeof height !== "number") {
+      throw new TypeError("height must be a number.");
     }
 
     this.x = x;
@@ -549,7 +558,7 @@ class Rect {
     return [this.x, this.y];
   }
   set topleft(topleft) {
-    let [x=0, y=0] = topleft;
+    let [x = 0, y = 0] = topleft;
     this.x = x;
     this.y = y;
   }
@@ -557,7 +566,7 @@ class Rect {
     return [this.x + this.width, this.y];
   }
   set topright(topright) {
-    let [x=0, y=0] = topright;
+    let [x = 0, y = 0] = topright;
     this.x = x - this.width;
     this.y = y;
   }
@@ -565,7 +574,7 @@ class Rect {
     return [this.x, this.y + this.height];
   }
   set bottomleft(bottomleft) {
-    let [x=0, y=0] = bottomleft;
+    let [x = 0, y = 0] = bottomleft;
     this.x = x;
     this.y = y - this.height;
   }
@@ -573,7 +582,7 @@ class Rect {
     return [this.x + this.width, this.y + this.height];
   }
   set bottomright(bottomright) {
-    let [x=0, y=0] = bottomright;
+    let [x = 0, y = 0] = bottomright;
     this.x = x - this.width;
     this.y = y - this.height;
   }
@@ -581,7 +590,7 @@ class Rect {
     return [this.x + Math.floor(this.width / 2), this.y];
   }
   set midtop(midtop) {
-    let [x=0, y=0] = midtop;
+    let [x = 0, y = 0] = midtop;
     this.x = x - Math.floor(this.width / 2);
     this.y = y;
   }
@@ -589,7 +598,7 @@ class Rect {
     return [this.x, this.y + Math.floor(this.height / 2)];
   }
   set midleft(midleft) {
-    let [x=0, y=0] = midleft;
+    let [x = 0, y = 0] = midleft;
     this.x = x;
     this.y = y - Math.floor(this.height / 2);
   }
@@ -597,7 +606,7 @@ class Rect {
     return [this.x + Math.floor(this.width / 2), this.y + this.height];
   }
   set midbottom(midbottom) {
-    let [x=0, y=0] = midbottom;
+    let [x = 0, y = 0] = midbottom;
     this.x = x - Math.floor(this.width / 2);
     this.y = y - this.height;
   }
@@ -605,15 +614,18 @@ class Rect {
     return [this.x + this.width, this.y + Math.floor(this.height / 2)];
   }
   set midright(midright) {
-    let [x=0, y=0] = midright;
+    let [x = 0, y = 0] = midright;
     this.x = x - this.width;
     this.y = y - Math.floor(this.height / 2);
   }
   get center() {
-    return [this.x + Math.floor(this.width / 2), this.y + Math.floor(this.height / 2)];
+    return [
+      this.x + Math.floor(this.width / 2),
+      this.y + Math.floor(this.height / 2),
+    ];
   }
   set center(center) {
-    let [x=0, y=0] = center;
+    let [x = 0, y = 0] = center;
     this.x = x - Math.floor(this.width / 2);
     this.y = y - Math.floor(this.height / 2);
   }
@@ -621,7 +633,7 @@ class Rect {
     return [this.width, this.height];
   }
   set size(size) {
-    let [w=0, h=0] = size;
+    let [w = 0, h = 0] = size;
     this.width = w;
     this.height = h;
   }
@@ -633,7 +645,12 @@ class Rect {
     this.y = this.y + dy;
   }
   inflate(dx, dy) {
-    return new Rect(this.x - Math.floor(dx / 2), this.y - Math.floor(dy / 2), this.width + dx, this.height + dy);
+    return new Rect(
+      this.x - Math.floor(dx / 2),
+      this.y - Math.floor(dy / 2),
+      this.width + dx,
+      this.height + dy,
+    );
   }
   inflate_ip(dx, dy) {
     this.x = this.x - Math.floor(dx / 2);
@@ -643,31 +660,26 @@ class Rect {
   }
   clamp() {
     let rect = new Rect(...arguments),
-        x, y;
+      x,
+      y;
 
     if (this.width >= rect.width) {
       x = rect.x + Math.floor(rect.width / 2) - Math.floor(this.width / 2);
-    }
-    else if (this.x < rect.x) {
+    } else if (this.x < rect.x) {
       x = rect.x;
-    }
-    else if ((this.x + this.width) > (rect.x + rect.width)) {
+    } else if (this.x + this.width > rect.x + rect.width) {
       x = rect.x + rect.width - this.width;
-    }
-    else {
+    } else {
       x = this.x;
     }
 
     if (this.height >= rect.height) {
       y = rect.y + Math.floor(rect.height / 2) - Math.floor(this.height / 2);
-    }
-    else if (this.y < rect.y) {
+    } else if (this.y < rect.y) {
       y = rect.y;
-    }
-    else if ((this.y + this.height) > (rect.y + rect.height)) {
+    } else if (this.y + this.height > rect.y + rect.height) {
       y = rect.y + rect.height - this.height;
-    }
-    else {
+    } else {
       y = this.y;
     }
 
@@ -682,48 +694,55 @@ class Rect {
   }
   clip() {
     let rect = new Rect(...arguments),
-        x, y, width, height;
+      x,
+      y,
+      width,
+      height;
 
-    if ((this.x >= rect.x) && (this.x < (rect.x + rect.width))) {
+    if (this.x >= rect.x && this.x < rect.x + rect.width) {
       x = this.x;
-    }
-    else if ((rect.x >= this.x) && (rect.x < (this.x + this.width))) {
+    } else if (rect.x >= this.x && rect.x < this.x + this.width) {
       x = rect.x;
-    }
-    else {
+    } else {
       // The two Rect objects do not intersect
       return new Rect(this.x, this.y, 0, 0);
     }
 
-    if (((this.x + this.width) > rect.x) && ((this.x + this.width) <= (rect.x + rect.width))) {
+    if (
+      this.x + this.width > rect.x &&
+      this.x + this.width <= rect.x + rect.width
+    ) {
       width = this.x + this.width - x;
-    }
-    else if (((rect.x + rect.width) > this.x) && ((rect.x + rect.width) <= (this.x + this.width))) {
+    } else if (
+      rect.x + rect.width > this.x &&
+      rect.x + rect.width <= this.x + this.width
+    ) {
       width = rect.x + rect.width - x;
-    }
-    else {
+    } else {
       // The two Rect objects do not intersect
       return new Rect(this.x, this.y, 0, 0);
     }
 
-    if ((this.y >= rect.y) && (this.y < (rect.y + rect.height))) {
+    if (this.y >= rect.y && this.y < rect.y + rect.height) {
       y = this.y;
-    }
-    else if ((rect.y >= this.y) && (rect.y < (this.y + this.height))) {
+    } else if (rect.y >= this.y && rect.y < this.y + this.height) {
       y = rect.y;
-    }
-    else {
+    } else {
       // The two Rect objects do not intersect
       return new Rect(this.x, this.y, 0, 0);
     }
 
-    if (((this.y + this.height) > rect.y) && ((this.y + this.height) <= (rect.y + rect.height))) {
+    if (
+      this.y + this.height > rect.y &&
+      this.y + this.height <= rect.y + rect.height
+    ) {
       height = this.y + this.height - y;
-    }
-    else if (((rect.y + rect.height) > this.y) && ((rect.y + rect.height) <= (this.y + this.height))) {
+    } else if (
+      rect.y + rect.height > this.y &&
+      rect.y + rect.height <= this.y + this.height
+    ) {
       height = rect.y + rect.height - y;
-    }
-    else {
+    } else {
       // The two Rect objects do not intersect
       return new Rect(this.x, this.y, 0, 0);
     }
@@ -739,10 +758,10 @@ class Rect {
   }
   union() {
     let rect = new Rect(...arguments),
-        x = Math.min(this.x, rect.x),
-        y = Math.min(this.y, rect.y),
-        width = Math.max(this.x + this.width, rect.x + rect.width) - x,
-        height = Math.max(this.y + this.height, rect.y + rect.height) - y;
+      x = Math.min(this.x, rect.x),
+      y = Math.min(this.y, rect.y),
+      width = Math.max(this.x + this.width, rect.x + rect.width) - x,
+      height = Math.max(this.y + this.height, rect.y + rect.height) - y;
     return new Rect(x, y, width, height);
   }
   union_ip() {
@@ -754,10 +773,10 @@ class Rect {
   }
   unionall(others) {
     let xs = [this.x],
-        ys = [this.y],
-        widths = [this.x + this.width],
-        heights = [this.y + this.height],
-        rect;
+      ys = [this.y],
+      widths = [this.x + this.width],
+      heights = [this.y + this.height],
+      rect;
     for (let other of others) {
       rect = new Rect(other);
       xs.push(rect.x);
@@ -766,9 +785,9 @@ class Rect {
       heights.push(rect.y + rect.height);
     }
     let x = Math.min(...xs),
-        y = Math.min(...ys),
-        width = Math.max(...widths) - x,
-        height = Math.max(...heights) - y;
+      y = Math.min(...ys),
+      width = Math.max(...widths) - x,
+      height = Math.max(...heights) - y;
     return new Rect(x, y, width, height);
   }
   unionall_ip(others) {
@@ -780,11 +799,11 @@ class Rect {
   }
   fit() {
     let rect = new Rect(...arguments),
-        ratio = Math.max(this.width / rect.width, this.height / rect.height),
-        width = Math.floor(this.width / ratio),
-        height = Math.floor(this.height / ratio),
-        x = rect.x + Math.floor((rect.width - width) / 2),
-        y = rect.y + Math.floor((rect.height - height) / 2);
+      ratio = Math.max(this.width / rect.width, this.height / rect.height),
+      width = Math.floor(this.width / ratio),
+      height = Math.floor(this.height / ratio),
+      x = rect.x + Math.floor((rect.width - width) / 2),
+      y = rect.y + Math.floor((rect.height - height) / 2);
     return new Rect(x, y, width, height);
   }
   normalize() {
@@ -799,12 +818,14 @@ class Rect {
   }
   contains() {
     let rect = new Rect(...arguments);
-    return ((this.x <= rect.x) &&
-            (this.y <= rect.y) &&
-            ((this.x + this.width) >= (rect.x + rect.width)) &&
-            ((this.y + this.height) >= (rect.y + rect.height)) &&
-            ((this.x + this.width) > rect.x) &&
-            ((this.y + this.height) > rect.y));
+    return (
+      this.x <= rect.x &&
+      this.y <= rect.y &&
+      this.x + this.width >= rect.x + rect.width &&
+      this.y + this.height >= rect.y + rect.height &&
+      this.x + this.width > rect.x &&
+      this.y + this.height > rect.y
+    );
   }
   collidepoint() {
     let x, y;
@@ -812,35 +833,37 @@ class Rect {
       return false;
     }
     if (arguments.length < 2) {
-      if (typeof arguments[0] !== 'object') {
+      if (typeof arguments[0] !== "object") {
         return false;
       }
       if (Array.isArray(arguments[0])) {
-        [x=0, y=0] = arguments[0];
+        [x = 0, y = 0] = arguments[0];
+      } else {
+        ({ x = 0, y = 0 } = arguments[0]);
       }
-      else {
-        ({x=0, y=0} = arguments[0]);
-      }
+    } else {
+      [x = 0, y = 0] = arguments;
     }
-    else {
-      [x=0, y=0] = arguments;
-    }
-    return ((this.x <= x) &&
-            (x < (this.x + this.width)) &&
-            (this.y <= y) &&
-            (y < (this.y + this.height)));
+    return (
+      this.x <= x &&
+      x < this.x + this.width &&
+      this.y <= y &&
+      y < this.y + this.height
+    );
   }
   colliderect() {
     let rect = new Rect(...arguments);
-    return ((this.x < (rect.x + rect.width)) &&
-            (this.y < (rect.y + rect.height)) &&
-            ((this.x + this.width) > rect.x) &&
-            ((this.y + this.height) > rect.y));
+    return (
+      this.x < rect.x + rect.width &&
+      this.y < rect.y + rect.height &&
+      this.x + this.width > rect.x &&
+      this.y + this.height > rect.y
+    );
   }
   _collidelist(others) {
     let result = [],
-        i = 0,
-        rect;
+      i = 0,
+      rect;
     for (let other of others) {
       rect = new Rect(other);
       if (this.colliderect(rect)) {
@@ -854,8 +877,7 @@ class Rect {
     let result = this._collidelist(others);
     if (result.length <= 0) {
       return -1;
-    }
-    else {
+    } else {
       return result[0];
     }
   }
@@ -870,8 +892,7 @@ class Rect {
           result.push(k, v);
           return result;
         }
-      }
-      else {
+      } else {
         if (this.colliderect(k)) {
           result.push(k, v);
           return result;
@@ -887,8 +908,7 @@ class Rect {
         if (this.colliderect(v)) {
           result.push([k, v]);
         }
-      }
-      else {
+      } else {
         if (this.colliderect(k)) {
           result.push([k, v]);
         }
@@ -901,8 +921,8 @@ class Rect {
   }
 }
 Rect.prototype.toString = function () {
-  return `{x: ${ this.x }, y: ${ this.y }, width: ${ this.width }, height: ${ this.height }}`;
-}
+  return `{x: ${this.x}, y: ${this.y}, width: ${this.width}, height: ${this.height}}`;
+};
 
 /*
  * The Actor class differs from that in Pygame Zero because x and y are not
@@ -923,11 +943,11 @@ class Actor {
 
     // If it is a Number, x offset in pixels from the topleft corner to the anchor
     // If it is a String, relative offset that is lazily evaluated
-    this.anchorDx = 'center';
+    this.anchorDx = "center";
 
     // If it is a Number, y offset in pixels from the topleft corner to the anchor
     // If it is a String, relative offset that is lazily evaluated
-    this.anchorDy = 'center';
+    this.anchorDy = "center";
 
     // Initialize the anchor at center with the topleft corner at (0, 0)
     this.posx = Math.floor(this.width / 2);
@@ -942,7 +962,7 @@ class Actor {
   }
   set name(name) {
     if (!(name in images)) {
-      throw new RangeError(`Unknown image "${ name }".`);
+      throw new RangeError(`Unknown image "${name}".`);
     }
     this._name = name;
   }
@@ -954,32 +974,26 @@ class Actor {
    */
   _calculateAnchor() {
     let result = [];
-    if (typeof this.anchorDx === 'number') {
+    if (typeof this.anchorDx === "number") {
       result.push(this.anchorDx);
-    }
-    else if (typeof this.anchorDx === 'string') {
-      if (this.anchorDx === 'left') {
+    } else if (typeof this.anchorDx === "string") {
+      if (this.anchorDx === "left") {
         result.push(0);
-      }
-      else if (this.anchorDx === 'center') {
+      } else if (this.anchorDx === "center") {
         result.push(Math.floor(this.width / 2));
-      }
-      else if (this.anchorDx === 'right') {
+      } else if (this.anchorDx === "right") {
         result.push(this.width);
       }
     }
 
-    if (typeof this.anchorDy === 'number') {
+    if (typeof this.anchorDy === "number") {
       result.push(this.anchorDy);
-    }
-    else if (typeof this.anchorDy === 'string') {
-      if (this.anchorDy === 'top') {
+    } else if (typeof this.anchorDy === "string") {
+      if (this.anchorDy === "top") {
         result.push(0);
-      }
-      else if (this.anchorDy === 'center') {
+      } else if (this.anchorDy === "center") {
         result.push(Math.floor(this.height / 2));
-      }
-      else if (this.anchorDy === 'bottom') {
+      } else if (this.anchorDy === "bottom") {
         result.push(this.height);
       }
     }
@@ -995,117 +1009,107 @@ class Actor {
    * but I did not write the Pygame Zero spec.
    */
   set anchor(anchor) {
-    let [originalDx=0, originalDy=0] = this._calculateAnchor();
+    let [originalDx = 0, originalDy = 0] = this._calculateAnchor();
 
-    if (typeof anchor === 'string') {
+    if (typeof anchor === "string") {
       let cleaned = anchor.trim().toLowerCase();
-      if (cleaned === 'topleft') {
-        this.anchorDx = 'left';
-        this.anchorDy = 'top';
+      if (cleaned === "topleft") {
+        this.anchorDx = "left";
+        this.anchorDy = "top";
+      } else if (cleaned === "midtop") {
+        this.anchorDx = "center";
+        this.anchorDy = "top";
+      } else if (cleaned === "topright") {
+        this.anchorDx = "right";
+        this.anchorDy = "top";
+      } else if (cleaned === "midleft") {
+        this.anchorDx = "left";
+        this.anchorDy = "center";
+      } else if (cleaned === "center") {
+        this.anchorDx = "center";
+        this.anchorDy = "center";
+      } else if (cleaned === "midright") {
+        this.anchorDx = "right";
+        this.anchorDy = "center";
+      } else if (cleaned === "bottomleft") {
+        this.anchorDx = "left";
+        this.anchorDy = "bottom";
+      } else if (cleaned === "midbottom") {
+        this.anchorDx = "center";
+        this.anchorDy = "bottom";
+      } else if (cleaned === "bottomright") {
+        this.anchorDx = "right";
+        this.anchorDy = "bottom";
+      } else {
+        throw new RangeError(
+          `Unknown anchor "${anchor}". Must be "topleft", "midtop", "topright", "midleft", "center", "midright", "bottomleft", "midbottom", or "bottomright".`,
+        );
       }
-      else if (cleaned === 'midtop') {
-        this.anchorDx = 'center';
-        this.anchorDy = 'top';
-      }
-      else if (cleaned === 'topright') {
-        this.anchorDx = 'right';
-        this.anchorDy = 'top';
-      }
-      else if (cleaned === 'midleft') {
-        this.anchorDx = 'left';
-        this.anchorDy = 'center';
-      }
-      else if (cleaned === 'center') {
-        this.anchorDx = 'center';
-        this.anchorDy = 'center';
-      }
-      else if (cleaned === 'midright') {
-        this.anchorDx = 'right';
-        this.anchorDy = 'center';
-      }
-      else if (cleaned === 'bottomleft') {
-        this.anchorDx = 'left';
-        this.anchorDy = 'bottom';
-      }
-      else if (cleaned === 'midbottom') {
-        this.anchorDx = 'center';
-        this.anchorDy = 'bottom';
-      }
-      else if (cleaned === 'bottomright') {
-        this.anchorDx = 'right';
-        this.anchorDy = 'bottom';
-      }
-      else {
-        throw new RangeError(`Unknown anchor "${ anchor }". Must be "topleft", "midtop", "topright", "midleft", "center", "midright", "bottomleft", "midbottom", or "bottomright".`);
-      }
-    }
-    else if (typeof anchor === 'object') {
+    } else if (typeof anchor === "object") {
       let originalAnchorDx = this.anchorDx,
-          originalAnchorDy = this.anchorDy,
-          x, y, cleaned;
+        originalAnchorDy = this.anchorDy,
+        x,
+        y,
+        cleaned;
       if (Array.isArray(anchor)) {
-        [x=0, y=0] = anchor;
-      }
-      else {
-        ({x=0, y=0} = anchor);
+        [x = 0, y = 0] = anchor;
+      } else {
+        ({ x = 0, y = 0 } = anchor);
       }
 
-      if (typeof x === 'number') {
+      if (typeof x === "number") {
         this.anchorDx = x;
-      }
-      else if (typeof x === 'string') {
+      } else if (typeof x === "string") {
         cleaned = x.trim().toLowerCase();
-        if (cleaned === 'left') {
-          this.anchorDx = 'left';
+        if (cleaned === "left") {
+          this.anchorDx = "left";
+        } else if (cleaned === "center" || cleaned === "middle") {
+          this.anchorDx = "center";
+        } else if (cleaned === "right") {
+          this.anchorDx = "right";
+        } else {
+          throw new RangeError(
+            `Unknown anchor "${x}". Must be "left", "center", "middle", or "right".`,
+          );
         }
-        else if ((cleaned === 'center') || (cleaned === 'middle')) {
-          this.anchorDx = 'center';
-        }
-        else if (cleaned === 'right') {
-          this.anchorDx = 'right';
-        }
-        else {
-          throw new RangeError(`Unknown anchor "${ x }". Must be "left", "center", "middle", or "right".`);
-        }
-      }
-      else {
-        throw new TypeError('Unrecognized anchor type. Must be a Number or a String.');
+      } else {
+        throw new TypeError(
+          "Unrecognized anchor type. Must be a Number or a String.",
+        );
       }
 
-      if (typeof y === 'number') {
+      if (typeof y === "number") {
         this.anchorDy = y;
-      }
-      else if (typeof y === 'string') {
+      } else if (typeof y === "string") {
         cleaned = y.trim().toLowerCase();
-        if (cleaned === 'top') {
-          this.anchorDy = 'top';
-        }
-        else if ((cleaned === 'center') || (cleaned === 'middle')) {
-          this.anchorDy = 'center';
-        }
-        else if (cleaned === 'bottom') {
-          this.anchorDy = 'bottom';
-        }
-        else {
+        if (cleaned === "top") {
+          this.anchorDy = "top";
+        } else if (cleaned === "center" || cleaned === "middle") {
+          this.anchorDy = "center";
+        } else if (cleaned === "bottom") {
+          this.anchorDy = "bottom";
+        } else {
           // Reset the anchor in case the x value is valid and was set
           this.anchorDx = originalAnchorDx;
           this.anchorDy = originalAnchorDy;
-          throw new RangeError(`Unknown anchor "${ y }". Must be "top", "center", "middle", or "bottom".`);
+          throw new RangeError(
+            `Unknown anchor "${y}". Must be "top", "center", "middle", or "bottom".`,
+          );
         }
-      }
-      else {
+      } else {
         // Reset the anchor in case the x value is valid and was set
         this.anchorDx = originalAnchorDx;
         this.anchorDy = originalAnchorDy;
-        throw new TypeError('Unrecognized anchor type. Must be a Number or a String.');
+        throw new TypeError(
+          "Unrecognized anchor type. Must be a Number or a String.",
+        );
       }
-    }
-    else {
-      throw new TypeError('Unrecognized anchor type.');
+    } else {
+      throw new TypeError("Unrecognized anchor type.");
     }
 
-    let [dx=0, dy=0] = this._calculateAnchor();
-    if ((dx !== originalDx) || (dy !== originalDy)) {
+    let [dx = 0, dy = 0] = this._calculateAnchor();
+    if (dx !== originalDx || dy !== originalDy) {
       // If the anchor offsets changed, then update the anchor
       this.posx = this.posx - originalDx + dx;
       this.posy = this.posy - originalDy + dy;
@@ -1118,10 +1122,9 @@ class Actor {
   set pos(pos) {
     let x, y;
     if (Array.isArray(pos)) {
-      [x=0, y=0] = pos;
-    }
-    else {
-      ({x=0, y=0} = pos);
+      [x = 0, y = 0] = pos;
+    } else {
+      ({ x = 0, y = 0 } = pos);
     }
     this.posx = x;
     this.posy = y;
@@ -1131,19 +1134,19 @@ class Actor {
    * Make x, y, width, and height available as attributes to mimic the Rect class.
    */
   get x() {
-    let [dx=0, dy=0] = this._calculateAnchor();
+    let [dx = 0, dy = 0] = this._calculateAnchor();
     return this.posx - dx;
   }
   set x(x) {
-    let [dx=0, dy=0] = this._calculateAnchor();
+    let [dx = 0, dy = 0] = this._calculateAnchor();
     this.posx = x + dx;
   }
   get y() {
-    let [dx=0, dy=0] = this._calculateAnchor();
+    let [dx = 0, dy = 0] = this._calculateAnchor();
     return this.posy - dy;
   }
   set y(y) {
-    let [dx=0, dy=0] = this._calculateAnchor();
+    let [dx = 0, dy = 0] = this._calculateAnchor();
     this.posy = y + dy;
   }
   get width() {
@@ -1196,7 +1199,7 @@ class Actor {
     return [this.x, this.y];
   }
   set topleft(topleft) {
-    let [x=0, y=0] = topleft;
+    let [x = 0, y = 0] = topleft;
     this.x = x;
     this.y = y;
   }
@@ -1204,7 +1207,7 @@ class Actor {
     return [this.x + this.width, this.y];
   }
   set topright(topright) {
-    let [x=0, y=0] = topright;
+    let [x = 0, y = 0] = topright;
     this.x = x - this.width;
     this.y = y;
   }
@@ -1212,7 +1215,7 @@ class Actor {
     return [this.x, this.y + this.height];
   }
   set bottomleft(bottomleft) {
-    let [x=0, y=0] = bottomleft;
+    let [x = 0, y = 0] = bottomleft;
     this.x = x;
     this.y = y - this.height;
   }
@@ -1220,7 +1223,7 @@ class Actor {
     return [this.x + this.width, this.y + this.height];
   }
   set bottomright(bottomright) {
-    let [x=0, y=0] = bottomright;
+    let [x = 0, y = 0] = bottomright;
     this.x = x - this.width;
     this.y = y - this.height;
   }
@@ -1228,7 +1231,7 @@ class Actor {
     return [this.x + Math.floor(this.width / 2), this.y];
   }
   set midtop(midtop) {
-    let [x=0, y=0] = midtop;
+    let [x = 0, y = 0] = midtop;
     this.x = x - Math.floor(this.width / 2);
     this.y = y;
   }
@@ -1236,7 +1239,7 @@ class Actor {
     return [this.x, this.y + Math.floor(this.height / 2)];
   }
   set midleft(midleft) {
-    let [x=0, y=0] = midleft;
+    let [x = 0, y = 0] = midleft;
     this.x = x;
     this.y = y - Math.floor(this.height / 2);
   }
@@ -1244,7 +1247,7 @@ class Actor {
     return [this.x + Math.floor(this.width / 2), this.y + this.height];
   }
   set midbottom(midbottom) {
-    let [x=0, y=0] = midbottom;
+    let [x = 0, y = 0] = midbottom;
     this.x = x - Math.floor(this.width / 2);
     this.y = y - this.height;
   }
@@ -1252,15 +1255,18 @@ class Actor {
     return [this.x + this.width, this.y + Math.floor(this.height / 2)];
   }
   set midright(midright) {
-    let [x=0, y=0] = midright;
+    let [x = 0, y = 0] = midright;
     this.x = x - this.width;
     this.y = y - Math.floor(this.height / 2);
   }
   get center() {
-    return [this.x + Math.floor(this.width / 2), this.y + Math.floor(this.height / 2)];
+    return [
+      this.x + Math.floor(this.width / 2),
+      this.y + Math.floor(this.height / 2),
+    ];
   }
   set center(center) {
-    let [x=0, y=0] = center;
+    let [x = 0, y = 0] = center;
     this.x = x - Math.floor(this.width / 2);
     this.y = y - Math.floor(this.height / 2);
   }
@@ -1269,12 +1275,14 @@ class Actor {
   }
   contains() {
     let rect = new Rect(...arguments);
-    return ((this.x <= rect.x) &&
-            (this.y <= rect.y) &&
-            ((this.x + this.width) >= (rect.x + rect.width)) &&
-            ((this.y + this.height) >= (rect.y + rect.height)) &&
-            ((this.x + this.width) > rect.x) &&
-            ((this.y + this.height) > rect.y));
+    return (
+      this.x <= rect.x &&
+      this.y <= rect.y &&
+      this.x + this.width >= rect.x + rect.width &&
+      this.y + this.height >= rect.y + rect.height &&
+      this.x + this.width > rect.x &&
+      this.y + this.height > rect.y
+    );
   }
   collidepoint() {
     let x, y;
@@ -1282,30 +1290,32 @@ class Actor {
       return false;
     }
     if (arguments.length < 2) {
-      if (typeof arguments[0] !== 'object') {
+      if (typeof arguments[0] !== "object") {
         return false;
       }
       if (Array.isArray(arguments[0])) {
-        [x=0, y=0] = arguments[0];
+        [x = 0, y = 0] = arguments[0];
+      } else {
+        ({ x = 0, y = 0 } = arguments[0]);
       }
-      else {
-        ({x=0, y=0} = arguments[0]);
-      }
+    } else {
+      [x = 0, y = 0] = arguments;
     }
-    else {
-      [x=0, y=0] = arguments;
-    }
-    return ((this.x <= x) &&
-            (x < (this.x + this.width)) &&
-            (this.y <= y) &&
-            (y < (this.y + this.height)));
+    return (
+      this.x <= x &&
+      x < this.x + this.width &&
+      this.y <= y &&
+      y < this.y + this.height
+    );
   }
   colliderect() {
     let rect = new Rect(...arguments);
-    return ((this.x < (rect.x + rect.width)) &&
-            (this.y < (rect.y + rect.height)) &&
-            ((this.x + this.width) > rect.x) &&
-            ((this.y + this.height) > rect.y));
+    return (
+      this.x < rect.x + rect.width &&
+      this.y < rect.y + rect.height &&
+      this.x + this.width > rect.x &&
+      this.y + this.height > rect.y
+    );
   }
 
   draw() {
@@ -1313,27 +1323,27 @@ class Actor {
   }
 
   _vector_to(target) {
-    let [ax=0, ay=0] = this.pos,
-        tuple = [],
-        x, y, dx, dy;
-    if (typeof target !== 'object') {
+    let [ax = 0, ay = 0] = this.pos,
+      tuple = [],
+      x,
+      y,
+      dx,
+      dy;
+    if (typeof target !== "object") {
       tuple.push(0, 0);
       return tuple;
-    }
-    else if (target instanceof Actor) {
-      [x=0, y=0] = target.pos;
-    }
-    else if (Array.isArray(target)) {
-      [x=0, y=0] = target;
-    }
-    else {
-      ({x=0, y=0} = target);
+    } else if (target instanceof Actor) {
+      [x = 0, y = 0] = target.pos;
+    } else if (Array.isArray(target)) {
+      [x = 0, y = 0] = target;
+    } else {
+      ({ x = 0, y = 0 } = target);
     }
 
     dx = x - ax;
     // The y-axis is inverted in graphics (positive goes down)
     dy = ay - y;
-    tuple.push(Math.hypot(dx, dy), Math.atan2(dy, dx) * 180 / Math.PI);
+    tuple.push(Math.hypot(dx, dy), (Math.atan2(dy, dx) * 180) / Math.PI);
     return tuple;
   }
 
@@ -1359,35 +1369,48 @@ class Actor {
    * this method returns the minimum bounding box as a Rect object.
    */
   getBoundingBox() {
-    let [dx=0, dy=0] = this._calculateAnchor(),
-        angle = this.angle % 360,
-        theta = -angle * Math.PI / 180,
-        sinTheta = Math.sin(theta),
-        cosTheta = Math.cos(theta),
-        // width and height of the minimum bounding box
-        width = Math.abs(this.width * cosTheta) + Math.abs(this.height * sinTheta),
-        height = Math.abs(this.width * sinTheta) + Math.abs(this.height * cosTheta),
-        // Offset of the anchor from the center
-        cax = dx - (this.width / 2),
-        cay = dy - (this.height / 2),
-        // Subtract rotated offset of the anchor from the center + half from anchor
-        x = this.posx - ((cax * cosTheta) - (cay * sinTheta) + (width / 2)),
-        y = this.posy - ((cax * sinTheta) + (cay * cosTheta) + (height / 2));
+    let [dx = 0, dy = 0] = this._calculateAnchor(),
+      angle = this.angle % 360,
+      theta = (-angle * Math.PI) / 180,
+      sinTheta = Math.sin(theta),
+      cosTheta = Math.cos(theta),
+      // width and height of the minimum bounding box
+      width =
+        Math.abs(this.width * cosTheta) + Math.abs(this.height * sinTheta),
+      height =
+        Math.abs(this.width * sinTheta) + Math.abs(this.height * cosTheta),
+      // Offset of the anchor from the center
+      cax = dx - this.width / 2,
+      cay = dy - this.height / 2,
+      // Subtract rotated offset of the anchor from the center + half from anchor
+      x = this.posx - (cax * cosTheta - cay * sinTheta + width / 2),
+      y = this.posy - (cax * sinTheta + cay * cosTheta + height / 2);
 
     // Use exact values if the angle is a right angle
     if (angle === 0) {
       return new Rect(this.x, this.y, this.width, this.height);
-    }
-    else if (angle === 90) {
-      return new Rect(this.posx - dy, this.posy - (this.width - dx), this.height, this.width);
-    }
-    else if (angle === 180) {
-      return new Rect(this.posx - (this.width - dx), this.posy - (this.height - dy), this.width, this.height);
-    }
-    else if (angle === 270) {
-      return new Rect(this.posx - (this.height - dy), this.posy - dx, this.height, this.width);
-    }
-    else {
+    } else if (angle === 90) {
+      return new Rect(
+        this.posx - dy,
+        this.posy - (this.width - dx),
+        this.height,
+        this.width,
+      );
+    } else if (angle === 180) {
+      return new Rect(
+        this.posx - (this.width - dx),
+        this.posy - (this.height - dy),
+        this.width,
+        this.height,
+      );
+    } else if (angle === 270) {
+      return new Rect(
+        this.posx - (this.height - dy),
+        this.posy - dx,
+        this.height,
+        this.width,
+      );
+    } else {
       return new Rect(x, y, width, height);
     }
   }
@@ -1413,75 +1436,77 @@ class Inbetweener {
   }
 
   static accelerate(n) {
-    return (n * n);
+    return n * n;
   }
 
   static decelerate(n) {
-    return (-1.0 * n * (n - 2.0));
+    return -1.0 * n * (n - 2.0);
   }
 
   static accel_decel(n) {
     let p = n * 2;
     if (p < 1) {
-      return (0.5 * p * p);
+      return 0.5 * p * p;
     }
     p -= 1.0;
-    return (-0.5 * ((p * (p - 2.0)) - 1.0));
+    return -0.5 * (p * (p - 2.0) - 1.0);
   }
 
   static in_elastic(n) {
     let p = 0.3,
-        s = p / 4.0;
+      s = p / 4.0;
     if (n === 1) {
       return 1.0;
     }
     n -= 1;
-    return -(Math.pow(2, 10 * n) * Math.sin((n - s) * 2 * Math.PI / p));
+    return -(Math.pow(2, 10 * n) * Math.sin(((n - s) * 2 * Math.PI) / p));
   }
 
   static out_elastic(n) {
     let p = 0.3,
-        s = p / 4.0;
+      s = p / 4.0;
     if (n === 1) {
       return 1.0;
     }
-    return ((Math.pow(2, -10 * n) * Math.sin((n - s) * 2 * Math.PI / p)) + 1.0);
+    return Math.pow(2, -10 * n) * Math.sin(((n - s) * 2 * Math.PI) / p) + 1.0;
   }
 
   static in_out_elastic(n) {
     let p = 0.3 * 1.5,
-        s = p / 4.0,
-        q = n * 2;
+      s = p / 4.0,
+      q = n * 2;
     if (q === 2) {
       return 1.0;
     }
     if (q < 1) {
       q -= 1;
-      return (-0.5 * Math.pow(2, 10 * q) * Math.sin((q - s) * 2 * Math.PI / p));
+      return -0.5 * Math.pow(2, 10 * q) * Math.sin(((q - s) * 2 * Math.PI) / p);
     }
     q -= 1;
-    return ((0.5 * Math.pow(2, -10 * q) * Math.sin((q - s) * 2 * Math.PI / p)) + 1.0);
+    return (
+      0.5 * Math.pow(2, -10 * q) * Math.sin(((q - s) * 2 * Math.PI) / p) + 1.0
+    );
   }
 
   static _out_bounce_internal(t, d) {
     let p = t / d;
-    if (p < (1.0 / 2.75)) {
-      return (7.5625 * p * p);
+    if (p < 1.0 / 2.75) {
+      return 7.5625 * p * p;
     }
-    if (p < (2.0 / 2.75)) {
+    if (p < 2.0 / 2.75) {
       p -= 1.5 / 2.75;
-      return ((7.5625 * p * p) + 0.75);
+      return 7.5625 * p * p + 0.75;
     }
-    if (p < (2.5 / 2.75)) {
+    if (p < 2.5 / 2.75) {
       p -= 2.25 / 2.75;
-      return ((7.5625 * p * p) + 0.9375);
+      return 7.5625 * p * p + 0.9375;
     }
     p -= 2.625 / 2.75;
-    return ((7.5625 * p * p) + 0.984375);
+    return 7.5625 * p * p + 0.984375;
   }
 
   static _in_bounce_internal(t, d) {
-    return (1.0 - Inbetweener._out_bounce_internal(d - t, d));
+    return 1.0 - Inbetweener._out_bounce_internal(d - t, d);
   }
 
   static bounce_end(n) {
@@ -1495,9 +1520,9 @@ class Inbetweener {
   static bounce_start_end(n) {
     let p = n * 2;
     if (p < 1) {
-      return (Inbetweener._in_bounce_internal(p, 1) * 0.5);
+      return Inbetweener._in_bounce_internal(p, 1) * 0.5;
     }
-    return ((Inbetweener._out_bounce_internal(p - 1, 1) * 0.5) + 0.5);
+    return Inbetweener._out_bounce_internal(p - 1, 1) * 0.5 + 0.5;
   }
 
   /*
@@ -1517,15 +1542,14 @@ class Inbetweener {
    */
   static _updateQueue(dt) {
     let due = [],
-        result = [];
+      result = [];
     for (let a of Inbetweener.queue) {
       a.update(dt);
       if (a.done) {
-        if (typeof a.callback === 'function') {
+        if (typeof a.callback === "function") {
           due.push(a.callback);
         }
-      }
-      else {
+      } else {
         result.push(a);
       }
     }
@@ -1539,25 +1563,24 @@ class Inbetweener {
   }
 
   constructor(puppet, duration, attributes, tween, callback) {
-    if (typeof puppet !== 'object') {
-      throw new TypeError('puppet must be an object.');
+    if (typeof puppet !== "object") {
+      throw new TypeError("puppet must be an object.");
     }
-    if (typeof duration !== 'number') {
-      throw new TypeError('duration must be a positive number in seconds.');
+    if (typeof duration !== "number") {
+      throw new TypeError("duration must be a positive number in seconds.");
     }
     if (duration <= 0) {
-      throw new RangeError('duration must be a positive number in seconds.');
+      throw new RangeError("duration must be a positive number in seconds.");
     }
-    if (typeof attributes !== 'object') {
-      throw new TypeError('attributes must be an object.');
+    if (typeof attributes !== "object") {
+      throw new TypeError("attributes must be an object.");
     }
-    if (typeof tween !== 'string') {
-      this.tween = 'linear';
-    }
-    else {
+    if (typeof tween !== "string") {
+      this.tween = "linear";
+    } else {
       this.tween = tween.trim().toLowerCase();
-      if (this.tween.startsWith('_') || (!(this.tween in Inbetweener))) {
-        throw new RangeError(`Unrecognized tween function "${ tween }".`);
+      if (this.tween.startsWith("_") || !(this.tween in Inbetweener)) {
+        throw new RangeError(`Unrecognized tween function "${tween}".`);
       }
     }
 
@@ -1574,21 +1597,20 @@ class Inbetweener {
         continue;
       }
       let start = this.puppet[a],
-          end = attributes[a];
-      if ((typeof start === 'number') && (typeof end === 'number')) {
-        this.attributes.set(a, {start: start, end: end});
-      }
-      else if (Array.isArray(start) && Array.isArray(end)) {
+        end = attributes[a];
+      if (typeof start === "number" && typeof end === "number") {
+        this.attributes.set(a, { start: start, end: end });
+      } else if (Array.isArray(start) && Array.isArray(end)) {
         if (start.length !== end.length) {
           continue;
         }
-        if (start.some((e) => (typeof e !== 'number'))) {
+        if (start.some((e) => typeof e !== "number")) {
           continue;
         }
-        if (end.some((e) => (typeof e !== 'number'))) {
+        if (end.some((e) => typeof e !== "number")) {
           continue;
         }
-        this.attributes.set(a, {start: start, end: end});
+        this.attributes.set(a, { start: start, end: end });
       }
     }
   }
@@ -1603,18 +1625,16 @@ class Inbetweener {
       for (let [k, v] of this.attributes) {
         this.puppet[k] = v.end;
       }
-    }
-    else {
+    } else {
       // Interpolate between start and end based on the tween function
       let n = Inbetweener[this.tween](this.elapsed / this.duration);
       for (let [k, v] of this.attributes) {
-        if (typeof v.start === 'number') {
-          this.puppet[k] = v.start + ((v.end - v.start) * n);
-        }
-        else if (Array.isArray(v.start)) {
+        if (typeof v.start === "number") {
+          this.puppet[k] = v.start + (v.end - v.start) * n;
+        } else if (Array.isArray(v.start)) {
           let result = [];
           for (let i = 0; i < v.start.length; i++) {
-            result.push(v.start[i] + ((v.end[i] - v.start[i]) * n));
+            result.push(v.start[i] + (v.end[i] - v.start[i]) * n);
           }
           this.puppet[k] = result;
         }
@@ -1630,7 +1650,7 @@ class Inbetweener {
       // If there is no property to update
       return true;
     }
-    return (this.elapsed > this.duration);
+    return this.elapsed > this.duration;
   }
 }
 
@@ -1641,25 +1661,25 @@ class Inbetweener {
 function animate() {
   if (arguments.length < 1) {
     // If there are not enough arguments
-    throw new Error('Not enough arguments.');
+    throw new Error("Not enough arguments.");
   }
 
   let animation;
   if (arguments.length < 3) {
     animation = arguments[0];
-  }
-  else {
+  } else {
     animation = new Inbetweener(...arguments);
   }
   if (animation instanceof Inbetweener) {
     if (!animation.done) {
       // Newly scheduled animations will overwrite old ones
-      Inbetweener.queue = Inbetweener.queue.filter((a) => (a.puppet !== animation.puppet));
+      Inbetweener.queue = Inbetweener.queue.filter(
+        (a) => a.puppet !== animation.puppet,
+      );
       Inbetweener.queue.push(animation);
     }
     return animation;
-  }
-  else {
-    throw new Error('Not enough arguments.');
+  } else {
+    throw new Error("Not enough arguments.");
   }
 }

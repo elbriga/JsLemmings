@@ -1,47 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>lemmings</title>
-  <style type="text/css" media="screen">
-body {
-  background-color: #7272c9;
-  color: black;
-}
-#original {
-  margin-left: 1em;
-}
-  </style>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lemmings</title>
+    <style type="text/css" media="screen">
+      body {
+        background-color: #7272c9;
+        color: black;
+      }
+      #original {
+        margin-left: 1em;
+      }
+    </style>
+  </head>
 
-<body>
-  <script src="js/lib/jsgame0.js"></script>
-  <script src="js/lib/draw.js"></script>
-  <script src="js/lib/sprite.js"></script>
-  <script src="js/lib/surface.js"></script>
-  <script src="js/lib/screen.js"></script>
-  
-  <script src="js/events.js"></script>
-  <script src="js/input.js"></script>
-  <script src="js/assets.js"></script>
-  <script src="js/level.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/entity.js"></script>
-  <script src="js/lemming.js"></script>
-  <script src="js/lemmingState.js"></script>
-<main>
-<h1>lemmings</h1>
+  <body>
+    <script src="js/lib/jsgame0.js"></script>
+    <script src="js/lib/draw.js"></script>
+    <script src="js/lib/sprite.js"></script>
+    <script src="js/lib/surface.js"></script>
+    <script src="js/lib/screen.js"></script>
 
-<canvas id="screen">
-The game screen appears here if your browser supports the Canvas API.
-</canvas>
-<section id="controls">
-  <button type="button" id="reset">Reset</button>
-  <button type="button" id="pause">Pause</button>
-</section>
-<div id="keysHelp">
-  <pre>
+    <script src="js/events.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/level.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/entity.js"></script>
+    <script src="js/lemming.js"></script>
+    <script src="js/lemmingState.js"></script>
+    <main>
+      <h1>lemmings</h1>
+
+      <canvas id="screen">
+        The game screen appears here if your browser supports the Canvas API.
+      </canvas>
+      <section id="controls">
+        <button type="button" id="reset">Reset</button>
+        <button type="button" id="pause">Pause</button>
+      </section>
+      <div id="keysHelp">
+        <pre>
   case "q":   game.quit();
   case "p":   game.toggle_paused();
   case "m":   game.toggle_show_mask();
@@ -52,53 +52,53 @@ The game screen appears here if your browser supports the Canvas API.
   case "d": game.select_skill("Digger");
   case "c": game.select_skill("Builder");
   case "g": game.select_skill("Umbrella");
-  </pre>
-</div>
-<div id="debug">DEBUG</div>
-</main>
-<script>
-var game = undefined;
-let numLevel = 1;
+  </pre
+        >
+      </div>
+      <div id="debug">DEBUG</div>
+    </main>
+    <script>
+      var game = undefined;
+      let numLevel = 1;
 
-// screen size
-HEIGHT = 800;
-WIDTH = 800;
+      // screen size
+      HEIGHT = 800;
+      WIDTH = 800;
 
-async function reset() {
-  console.log("reset()");
-  game = await Game.create(numLevel);
-  if (numLevel < 4) numLevel++;
-}
+      async function reset() {
+        console.log("reset()");
+        game = await Game.create(numLevel);
+        //if (numLevel < 4) numLevel++;
+      }
 
-function update() {
-  if(game) game.update();
-}
+      function update() {
+        if (game) game.update();
+      }
 
-function draw() {
-  if(game) game.draw();
-}
+      function draw() {
+        if (game) game.draw();
+      }
 
-function on_mouse_move(pos, delta, buttons) {
-  Input.updateMouse(pos, delta, buttons);
-}
+      function on_mouse_move(pos, delta, buttons) {
+        Input.updateMouse(pos, delta, buttons);
+      }
 
-function on_mouse_down(pos, buttons) {
-  Events.onMouseClick(game, buttons, pos);
-}
+      function on_mouse_down(pos, buttons) {
+        Events.onMouseClick(game, buttons, pos);
+      }
 
-window.addEventListener('load', async (event) => {
-  const canvas = document.getElementById("screen");
-  canvas.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-  });
+      window.addEventListener("load", async (event) => {
+        const canvas = document.getElementById("screen");
+        canvas.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+        });
 
-  screen.init();
-});
+        screen.init();
+      });
 
-window.addEventListener("keydown", (e) => {
-  Events.onKeyPress(game, e.key);
-});
-</script>
-</body>
-
+      window.addEventListener("keydown", (e) => {
+        Events.onKeyPress(game, e.key);
+      });
+    </script>
+  </body>
 </html>

@@ -14,13 +14,13 @@ class Entity {
   get x() {
     return this.rect.centerx;
   }
-    
+
   get y() {
     return this.rect.bottom;
   }
 
   get pos() {
-    return [ this.x, this.y ];
+    return [this.x, this.y];
   }
 
   update() {
@@ -31,7 +31,7 @@ class Entity {
     return;
   }
 
-  set_animation(name, next="") {
+  set_animation(name, next = "") {
     this.frames = Assets.animations[`lemming_${name}`];
     this.animNext = next;
     this.frame = 0;
@@ -41,7 +41,7 @@ class Entity {
   on_cycle_anim() {
     return;
   }
-  
+
   // Invocado quando a animacao muda no mesmo estado (com animNext)
   on_change_anim() {
     return;
