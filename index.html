@@ -13,9 +13,13 @@
         margin-left: 1em;
       }
     </style>
+    <link rel="stylesheet" href="css/diff.css" />
   </head>
 
   <body>
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+    <script src="diff/diff.js"></script>
+
     <script src="js/lib/jsgame0.js"></script>
     <script src="js/lib/draw.js"></script>
     <script src="js/lib/sprite.js"></script>
@@ -52,12 +56,16 @@
   case "d": game.select_skill("Digger");
   case "c": game.select_skill("Builder");
   case "g": game.select_skill("Umbrella");
-  </pre
-        >
+        </pre>
       </div>
       <div id="debug">DEBUG</div>
+      <h1>Sources Python vs Javascript</h1>
+      <div id="diffs-container"></div>
     </main>
     <script>
+      const diffsContainer = document.getElementById("diffs-container");
+      diffsContainer.appendChild(diff("js/game.js", "python/game.py"));
+
       var game = undefined;
       let numLevel = 1;
 

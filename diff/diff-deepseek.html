@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Diff Compare Studio | Linked Scroll & Diff Highlight</title>
+    <!-- jsdiff library for robust diff calculations -->
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #f1f5f9;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          monospace;
+        padding: 24px 20px;
+        color: #0f172a;
+      }
+
+      /* main container */
+      .compare-app {
+        max-width: 1600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.2s;
+      }
+
+      /* header & controls */
+      .toolbar {
+        background: #ffffffdd;
+        backdrop-filter: blur(4px);
+        padding: 20px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 18px;
+        row-gap: 16px;
+      }
+
+      .url-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .url-group label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+      }
+
+      .url-input {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        font-family: "SF Mono", "Fira Code", monospace;
+        transition: 0.2s;
+      }
+
+      .url-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        background: white;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: white;
+        border: 1px solid #cbd5e1;
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: 0.2s;
+        font-family: inherit;
+        background: #f9fafb;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: white;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+
+      .status {
+        font-size: 0.8rem;
+        background: #f1f5f9;
+        padding: 5px 12px;
+        border-radius: 40px;
+        color: #334155;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #cbd5e1;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* compare editor layout */
+      .compare-panels {
+        display: flex;
+        width: 100%;
+        height: calc(100vh - 220px);
+        min-height: 500px;
+        border-top: 1px solid #e2e8f0;
+        background: #fefefe;
+      }
+
+      .panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-right: 1px solid #e9eef3;
+        overflow: hidden;
+      }
+
+      .panel:last-child {
+        border-right: none;
+      }
+
+      .panel-header {
+        padding: 12px 18px;
+        background: #fafcff;
+        border-bottom: 1px solid #e9edf2;
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        backdrop-filter: blur(2px);
+      }
+
+      .file-badge {
+        background: #eef2ff;
+        color: #1e40af;
+        padding: 4px 10px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 500;
+      }
+
+      .diff-container {
+        flex: 1;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        background: #ffffff;
+      }
+
+      .diff-lines {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .line-row {
+        display: flex;
+        border-bottom: 1px solid #f0f2f5;
+        min-height: 32px;
+        transition: background 0.05s ease;
+      }
+
+      .line-number {
+        width: 58px;
+        text-align: right;
+        padding: 4px 12px 4px 8px;
+        background: #fafcff;
+        color: #6c7a91;
+        border-right: 1px solid #edf2f7;
+        user-select: none;
+        font-size: 11.5px;
+        letter-spacing: 0.2px;
+        font-weight: 500;
+      }
+
+      .line-content {
+        flex: 1;
+        padding: 4px 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: inherit;
+        background: inherit;
+      }
+
+      /* diff styles */
+      .line-unchanged .line-content {
+        background: transparent;
+        color: #1e293b;
+      }
+
+      .line-removed .line-content {
+        background: #fee2e2;
+        color: #991b1b;
+        text-decoration: none;
+        border-left: 3px solid #ef4444;
+      }
+
+      .line-added .line-content {
+        background: #e0f2fe;
+        color: #0c4a6e;
+        border-left: 3px solid #3b82f6;
+      }
+
+      .line-empty .line-content {
+        background: #f8fafc;
+        color: #94a3b8;
+        font-style: italic;
+      }
+
+      /* subtle hover for readability */
+      .line-row:hover {
+        background: #fefce8;
+      }
+
+      /* scrollbar styling */
+      .diff-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      .diff-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+      }
+
+      .diff-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 6px;
+      }
+
+      .error-message {
+        padding: 32px;
+        text-align: center;
+        color: #b91c1c;
+        background: #fff5f5;
+        border-radius: 20px;
+        margin: 20px;
+        font-family: monospace;
+      }
+
+      .placeholder-info {
+        padding: 40px;
+        text-align: center;
+        color: #64748b;
+        font-style: italic;
+      }
+
+      @media (max-width: 780px) {
+        .toolbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .compare-panels {
+          flex-direction: column;
+          height: auto;
+        }
+        .panel {
+          min-height: 380px;
+          border-bottom: 2px solid #e2e8f0;
+        }
+        .line-number {
+          width: 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="compare-app">
+      <div class="toolbar">
+        <div class="url-group">
+          <label>📄 LEFT FILE URL</label>
+          <input
+            type="text"
+            id="leftUrl"
+            class="url-input"
+            placeholder="https://... file1.txt"
+            value="https://loripsum.net/api/4/plaintext"
+          />
+        </div>
+        <div class="url-group">
+          <label>📄 RIGHT FILE URL</label>
+          <input
+            type="text"
+            id="rightUrl"
+            class="url-input"
+            placeholder="https://... file2.txt"
+            value="https://loripsum.net/api/4/plaintext?offset=2&decorate=false"
+          />
+        </div>
+        <div class="button-group">
+          <button id="fetchBtn" class="btn btn-primary">
+            🚀 FETCH & COMPARE
+          </button>
+          <button id="resetExampleBtn" class="btn btn-secondary">
+            📋 LOAD DEMO TEXTS
+          </button>
+        </div>
+        <div id="statusArea" class="status">✅ Ready</div>
+      </div>
+
+      <div class="compare-panels">
+        <!-- LEFT PANEL -->
+        <div class="panel">
+          <div class="panel-header">
+            <span>📄 LEFT DOCUMENT</span>
+            <span id="leftFileName" class="file-badge">original</span>
+          </div>
+          <div id="leftDiffContainer" class="diff-container">
+            <div class="placeholder-info">
+              ← Load or fetch files to see diff
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT PANEL -->
+        <div class="panel">
+          <div class="panel-header">
+            <span>📄 RIGHT DOCUMENT</span>
+            <span id="rightFileName" class="file-badge">modified</span>
+          </div>
+          <div id="rightDiffContainer" class="diff-container">
+            <div class="placeholder-info">
+              → Load or fetch files to see diff
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---- DOM elements ----
+      const leftUrlInput = document.getElementById("leftUrl");
+      const rightUrlInput = document.getElementById("rightUrl");
+      const fetchBtn = document.getElementById("fetchBtn");
+      const resetDemoBtn = document.getElementById("resetExampleBtn");
+      const statusDiv = document.getElementById("statusArea");
+      const leftContainer = document.getElementById("leftDiffContainer");
+      const rightContainer = document.getElementById("rightDiffContainer");
+      const leftFileBadge = document.getElementById("leftFileName");
+      const rightFileBadge = document.getElementById("rightFileName");
+
+      // scroll sync flags
+      let isLeftScrolling = false;
+      let isRightScrolling = false;
+
+      // Helper: escape HTML to avoid injection
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // status update
+      function setStatus(text, isLoading = false) {
+        if (isLoading) {
+          statusDiv.innerHTML = `<span class="spinner"></span> ${text}`;
+        } else {
+          statusDiv.innerHTML = `✅ ${text}`;
+        }
+      }
+
+      // show error inside panels gracefully
+      function showError(panelLeft, panelRight, errorMsg) {
+        const errorHtml = `<div class="error-message">⚠️ ${escapeHtml(errorMsg)}</div>`;
+        leftContainer.innerHTML = errorHtml;
+        rightContainer.innerHTML = errorHtml;
+      }
+
+      // Core diff + render with side-by-side alignment (pairing removed/added blocks)
+      function renderDiff(
+        leftText,
+        rightText,
+        leftSourceName = "left",
+        rightSourceName = "right",
+      ) {
+        if (!leftText && !rightText) {
+          leftContainer.innerHTML =
+            '<div class="placeholder-info">Empty content</div>';
+          rightContainer.innerHTML =
+            '<div class="placeholder-info">Empty content</div>';
+          return;
+        }
+
+        // handle trailing newline consistency: split into lines, keep last empty if needed but diff library handles well.
+        // using diffLines from jsdiff
+        const changes = Diff.diffLines(leftText || "", rightText || "");
+
+        // build aligned rows (leftRows & rightRows) with proper pairing of removed+added blocks
+        const leftRows = []; // each: { text, type }
+        const rightRows = [];
+
+        for (let i = 0; i < changes.length; i++) {
+          const part = changes[i];
+
+          if (part.removed) {
+            // removed block: look ahead to see if next is added (paired modification)
+            let removedLines = part.value.split(/\r?\n/);
+            if (
+              removedLines.length > 0 &&
+              removedLines[removedLines.length - 1] === ""
+            )
+              removedLines.pop();
+
+            let addedLines = [];
+            let hasPairedAdd = false;
+            if (i + 1 < changes.length && changes[i + 1].added) {
+              const nextPart = changes[i + 1];
+              addedLines = nextPart.value.split(/\r?\n/);
+              if (
+                addedLines.length > 0 &&
+                addedLines[addedLines.length - 1] === ""
+              )
+                addedLines.pop();
+              hasPairedAdd = true;
+              i++; // skip the added part because we pair it now
+            }
+
+            // Pair removed and added lines side by side (max length)
+            const maxLen = Math.max(removedLines.length, addedLines.length);
+            for (let j = 0; j < maxLen; j++) {
+              const leftLine = j < removedLines.length ? removedLines[j] : "";
+              const rightLine = j < addedLines.length ? addedLines[j] : "";
+              leftRows.push({
+                text: leftLine,
+                type: leftLine !== "" ? "removed" : "empty",
+              });
+              rightRows.push({
+                text: rightLine,
+                type: rightLine !== "" ? "added" : "empty",
+              });
+            }
+          } else if (part.added) {
+            // standalone added block (no previous removed) → insert on right only
+            let addedLines = part.value.split(/\r?\n/);
+            if (
+              addedLines.length > 0 &&
+              addedLines[addedLines.length - 1] === ""
+            )
+              addedLines.pop();
+            for (let line of addedLines) {
+              leftRows.push({ text: "", type: "empty" });
+              rightRows.push({ text: line, type: "added" });
+            }
+          } else {
+            // unchanged block
+            let unchangedLines = part.value.split(/\r?\n/);
+            if (
+              unchangedLines.length > 0 &&
+              unchangedLines[unchangedLines.length - 1] === ""
+            )
+              unchangedLines.pop();
+            for (let line of unchangedLines) {
+              leftRows.push({ text: line, type: "unchanged" });
+              rightRows.push({ text: line, type: "unchanged" });
+            }
+          }
+        }
+
+        // Helper to render one panel rows with line numbers
+        function renderPanel(rowsArray, containerElement) {
+          if (!rowsArray.length) {
+            containerElement.innerHTML =
+              '<div class="placeholder-info">No lines to display</div>';
+            return;
+          }
+
+          const linesHtml = [];
+          for (let idx = 0; idx < rowsArray.length; idx++) {
+            const row = rowsArray[idx];
+            const escapedContent = escapeHtml(row.text);
+            let lineClass = "";
+            if (row.type === "removed") lineClass = "line-removed";
+            else if (row.type === "added") lineClass = "line-added";
+            else if (row.type === "empty") lineClass = "line-empty";
+            else lineClass = "line-unchanged";
+
+            // display special placeholder for empty lines (visual cue)
+            let displayContent = escapedContent;
+            if (row.type === "empty" && row.text === "") {
+              displayContent = '<span style="opacity:0.5;">␣</span>';
+            }
+
+            linesHtml.push(`
+          <div class="line-row ${lineClass}">
+            <div class="line-number">${idx + 1}</div>
+            <div class="line-content">${displayContent || " "}</div>
+          </div>
+        `);
+          }
+          containerElement.innerHTML = `<div class="diff-lines">${linesHtml.join("")}</div>`;
+        }
+
+        renderPanel(leftRows, leftContainer);
+        renderPanel(rightRows, rightContainer);
+
+        // update badges with filenames (or truncate)
+        leftFileBadge.innerText =
+          leftSourceName.length > 28
+            ? leftSourceName.slice(0, 25) + "..."
+            : leftSourceName;
+        rightFileBadge.innerText =
+          rightSourceName.length > 28
+            ? rightSourceName.slice(0, 25) + "..."
+            : rightSourceName;
+
+        // after rendering, attach scroll sync listeners (re-attach after content replace)
+        attachScrollSync();
+      }
+
+      // scroll synchronization logic
+      let scrollSyncActive = true;
+      function attachScrollSync() {
+        // remove previous listeners to avoid duplicates
+        if (leftContainer._scrollHandler)
+          leftContainer.removeEventListener(
+            "scroll",
+            leftContainer._scrollHandler,
+          );
+        if (rightContainer._scrollHandler)
+          rightContainer.removeEventListener(
+            "scroll",
+            rightContainer._scrollHandler,
+          );
+
+        const leftHandler = function (e) {
+          if (!scrollSyncActive) return;
+          if (isLeftScrolling) return;
+          isRightScrolling = true;
+          rightContainer.scrollTop = leftContainer.scrollTop;
+          setTimeout(() => {
+            isRightScrolling = false;
+          }, 30);
+        };
+
+        const rightHandler = function (e) {
+          if (!scrollSyncActive) return;
+          if (isRightScrolling) return;
+          isLeftScrolling = true;
+          leftContainer.scrollTop = rightContainer.scrollTop;
+          setTimeout(() => {
+            isLeftScrolling = false;
+          }, 30);
+        };
+
+        leftContainer.addEventListener("scroll", leftHandler);
+        rightContainer.addEventListener("scroll", rightHandler);
+
+        leftContainer._scrollHandler = leftHandler;
+        rightContainer._scrollHandler = rightHandler;
+      }
+
+      // Fetch two files from URLs
+      async function fetchAndCompare(leftUrl, rightUrl) {
+        if (!leftUrl.trim() || !rightUrl.trim()) {
+          setStatus("❌ Please enter both file URLs", false);
+          showError(leftContainer, rightContainer, "URLs cannot be empty");
+          return;
+        }
+
+        setStatus(`Fetching files...`, true);
+        leftContainer.innerHTML =
+          '<div class="placeholder-info"><span class="spinner"></span> Loading left file...</div>';
+        rightContainer.innerHTML =
+          '<div class="placeholder-info"><span class="spinner"></span> Loading right file...</div>';
+
+        try {
+          const [leftResp, rightResp] = await Promise.all([
+            fetch(leftUrl).catch((err) => {
+              throw new Error(`Left fetch failed: ${err.message}`);
+            }),
+            fetch(rightUrl).catch((err) => {
+              throw new Error(`Right fetch failed: ${err.message}`);
+            }),
+          ]);
+
+          if (!leftResp.ok)
+            throw new Error(
+              `Left URL (${leftResp.status}): ${leftResp.statusText}`,
+            );
+          if (!rightResp.ok)
+            throw new Error(
+              `Right URL (${rightResp.status}): ${rightResp.statusText}`,
+            );
+
+          const leftText = await leftResp.text();
+          const rightText = await rightResp.text();
+
+          // extract filename from url for display
+          const leftName = extractFileName(leftUrl);
+          const rightName = extractFileName(rightUrl);
+
+          renderDiff(leftText, rightText, leftName, rightName);
+          setStatus(
+            `Compared successfully · ${leftRowsCount(leftText)} lines vs ${rightRowsCount(rightText)} lines`,
+            false,
+          );
+        } catch (error) {
+          console.error(error);
+          setStatus(`Error: ${error.message}`, false);
+          showError(
+            leftContainer,
+            rightContainer,
+            `Fetch error: ${error.message}`,
+          );
+        }
+      }
+
+      function leftRowsCount(text) {
+        return text ? text.split(/\r?\n/).length : 0;
+      }
+      function rightRowsCount(text) {
+        return text ? text.split(/\r?\n/).length : 0;
+      }
+
+      function extractFileName(url) {
+        try {
+          const path = new URL(url).pathname;
+          let base = path.split("/").pop();
+          if (!base) base = "document";
+          return decodeURIComponent(base).substring(0, 30);
+        } catch (e) {
+          return "remote file";
+        }
+      }
+
+      // Demo texts (built-in classical diff example)
+      function loadDemoComparison() {
+        setStatus("Loading demo texts (local classic diff)", false);
+        const leftDemo = `The quick brown fox jumps over the lazy dog.
+Implement diff with side-by-side view.
+Scroll sync is mandatory.
+This line will be modified.
+Line that stays unchanged.
+Another interesting concept: linked scrolling.
+Footer line present.`;
+
+        const rightDemo = `The quick brown fox jumps over the lazy dog.
+Implement diff with side-by-side view & highlighting.
+Scroll sync is mandatory and works perfectly.
+This line was changed to something better.
+Line that stays unchanged.
+Another interesting concept: linked scrolling & realtime.
+Brand new extra line added.
+Footer line present.`;
+
+        renderDiff(
+          leftDemo,
+          rightDemo,
+          "demo_original.txt",
+          "demo_modified.txt",
+        );
+        // set placeholder URLs to indicate demo
+        leftUrlInput.value = "demo: classic lorem comparison";
+        rightUrlInput.value = "demo: with changes";
+      }
+
+      // bonus: default fetch from current URLs when page loads
+      function initialFetchFromUrls() {
+        const leftVal = leftUrlInput.value.trim();
+        const rightVal = rightUrlInput.value.trim();
+        if (
+          leftVal &&
+          rightVal &&
+          (leftVal.startsWith("http") || rightVal.startsWith("http"))
+        ) {
+          fetchAndCompare(leftVal, rightVal);
+        } else {
+          // fallback demo to show UI capabilities
+          loadDemoComparison();
+          setStatus(
+            "Demo active — use valid URLs to fetch external files",
+            false,
+          );
+        }
+      }
+
+      // ---- Event binding ----
+      fetchBtn.addEventListener("click", () => {
+        const leftUrl = leftUrlInput.value.trim();
+        const rightUrl = rightUrlInput.value.trim();
+        if (!leftUrl || !rightUrl) {
+          setStatus("⚠️ Please provide both file URLs", false);
+          return;
+        }
+        fetchAndCompare(leftUrl, rightUrl);
+      });
+
+      resetDemoBtn.addEventListener("click", () => {
+        loadDemoComparison();
+        // optionally keep the url inputs readable but not interfering
+        leftUrlInput.placeholder = "e.g., https://example.com/file.txt";
+        rightUrlInput.placeholder = "e.g., https://example.com/file2.txt";
+        setStatus("Demo diff loaded (local comparison)", false);
+      });
+
+      // sync toggle not needed but always active
+      // additional: ensure scroll sync after window resize (content stays)
+      window.addEventListener("resize", () => {
+        // no rerender needed, just maintain scroll position consistency
+        if (leftContainer && rightContainer && scrollSyncActive) {
+          // optionally sync after resize but only if we want
+        }
+      });
+
+      // initialize component: attach scroll base + load either default urls or demo
+      attachScrollSync();
+      // if URLs contain http (default URLs are http), we fetch them
+      const leftInitial = leftUrlInput.value.trim();
+      const rightInitial = rightUrlInput.value.trim();
+      if (leftInitial.startsWith("http") && rightInitial.startsWith("http")) {
+        initialFetchFromUrls();
+      } else {
+        loadDemoComparison();
+        setStatus("Ready — click FETCH to compare external files", false);
+      }
+
+      // extra utility: if demo shows, we still allow fetch
+      // additional style for line-empty to show subtle gap
+    </script>
+  </body>
+</html>
