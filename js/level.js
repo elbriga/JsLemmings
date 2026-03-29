@@ -163,7 +163,5 @@ class LevelConfig {
         this.skills[key] += value;
       }
     }
-    // Remover as skills com valor 0
-    //this.skills = {k: v for k, v in this.skills.items() if v > 0}
   }
 }

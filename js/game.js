@@ -5,7 +5,9 @@ class Game {
     return game;
   }
 
-  constructor() {
+  async _load(numLevel) {
+    const [level] = await Promise.all([Level.create(numLevel), Assets.load()]);
+
     this.width = screen.bounds().width;
     this.height = screen.bounds().height;
     //this.running = true; // Controla o loop principal
@@ -14,7 +16,6 @@ class Game {
     this.lemmings = [];
     this.entities = [];
     this.skillsButtons = [];
-    this.newLevel = undefined; // Controla o Spawn de um novo Level ou o mesmo (reset)
     this.points = 0;
     this.totLemmings = 0;
     this.selectedSkill = "Builder";
@@ -26,15 +27,9 @@ class Game {
     this.debug = false;
     this.scoreFont = "20px Arial";
     this.skillsFont = "30px Arial";
-  }
-
-  async _load(numLevel) {
-    const [level, assets, objects] = await Promise.all([
-      Level.create(numLevel),
-      Assets.load(),
-    ]);
 
     this.level = level;
+
     this.load_objects();
     this.build_skills_buttons();
   }
@@ -52,11 +47,19 @@ class Game {
     for (const l of this.lemmings) if (!l.dead) l.set_state("Exploder");
   }
 
-  new() {
-    this.newLevel = this.level.config.number;
+  async new() {
+    let newLevel = this.level.config.number;
+    // Checar o placar
     if (this.points >= this.level.config.numLemmingsToSave) {
       // Win!
-      this.newLevel += 1;
+      newLevel += 1;
+    }
+
+    if (newLevel > 4) {
+      // FIM!
+      // TODO
+    } else {
+      await game._load(newLevel);
     }
   }
 

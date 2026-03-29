@@ -4,7 +4,7 @@ class Events {
 
     if (game.endScene) {
       // Tratar os eventos de End Scene
-      reset();
+      game.new();
       return;
     }
 
@@ -46,7 +46,7 @@ class Events {
 
     if (game.endScene) {
       // Tratar os eventos de End Scene
-      reset();
+      game.new();
       return;
     }
 
