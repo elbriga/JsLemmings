@@ -1,7 +1,7 @@
 {
   "numLemmings": 10,
-  "numLemmingsToSave": 5,
-  "releaseRate": 10,
+  "numLemmingsToSave": 2,
+  "releaseRate": 6,
   "timeLimit": 300,
   "backgroundColour": [114, 114, 201],
 
@@ -17,7 +17,7 @@
 
   "objects": [
     { "type": "entrance", "x": 100, "y": 100 },
-    { "type": "exit", "x": 580, "y": 710 },
+    { "type": "exit", "x": 650, "y": 620 },
 
     { "type": "water", "x": 450, "y": 250 },
     { "type": "steel", "x": 300, "y": 180, "w": 64, "h": 32 },

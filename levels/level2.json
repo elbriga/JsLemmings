@@ -1,18 +1,18 @@
 {
   "numLemmings": 10,
-  "numLemmingsToSave": 5,
-  "releaseRate": 10,
-  "timeLimit": 300,
+  "numLemmingsToSave": 8,
+  "releaseRate": 8,
+  "timeLimit": 200,
   "backgroundColour": [114, 114, 201],
 
-  "music": "level1",
+  "music": "level2",
   "background": "cave",
 
   "skills": {
     "Blocker": 1,
-    "Umbrella": 1,
-    "Exploder": 5,
-    "Builder": 2
+    "Umbrella": 3,
+    "Exploder": 1,
+    "Builder": 4
   },
 
   "objects": [
