@@ -1,5 +1,6 @@
 class Button {
-  constructor(img, text, x, y, color) {
+  constructor(skillName, img, text, x, y, color) {
+    this.skillName = skillName;
     this.img = img;
     this.text = text;
     this.color = color;

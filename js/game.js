@@ -177,21 +177,18 @@ class Game {
   build_skills_buttons() {
     let i = 0;
     this.skillsButtons = [];
-    for (let key in this.level.config.skills) {
-      let val = this.level.config.skills[key];
+    for (let skillName in this.level.config.skills) {
+      let val = this.level.config.skills[skillName];
       if (val <= 0) continue;
 
-      if (key == "Umbrella") {
-        key = "Floater";
-      }
-      let construct = LemmingState.states[key];
-
+      let construct =
+        LemmingState.states[skillName == "Umbrella" ? "Floater" : skillName];
       let skill = new construct(null);
 
       let ico = Assets.animations[`lemming_${skill.ico}`][skill.icoFrame];
-      let color = key == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
+      let color = skillName == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
 
-      let btn = new Button(ico, val, 400 + i * 70, 10, color);
+      let btn = new Button(skillName, ico, val, 400 + i * 70, 10, color);
       i += 1;
 
       this.skillsButtons.push(btn);
@@ -228,6 +225,8 @@ class Game {
   select_skill(skillName) {
     if (skillName in this.level.config.skills) {
       this.selectedSkill = skillName;
+      // Atualizar o selecionado
+      this.build_skills_buttons();
     }
   }
 

@@ -8,6 +8,21 @@ class Events {
       return;
     }
 
+    // botoes de skills
+    const [x, y] = pos;
+    for (const btn of game.skillsButtons) {
+      if (
+        x >= btn.rect.x &&
+        x < btn.rect.x + btn.rect.width &&
+        y >= btn.rect.y &&
+        y < btn.rect.y + btn.rect.height
+      ) {
+        //console.log(`Botão [${btn.skillName}] pressionado`);
+        game.select_skill(btn.skillName);
+        return;
+      }
+    }
+
     if (game.hovered) {
       const lem = game.hovered;
       switch (buttons) {
