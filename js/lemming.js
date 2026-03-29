@@ -14,24 +14,26 @@ class Lemming extends Entity {
   }
 
   draw() {
-    //screen.blit("lemming", this.rect);
-
     var frame = this.frames[this.frame % this.frames.length];
     if (this.direction == -1) {
       frame = frame.flip(true, false);
     }
     screen.blit(frame, this.rect);
-    /*if ( this.hasUmbrella && this.stateName == "Walker") {
-        pygame.draw.circle(screen, (255, 255, 0), self.pos, 5);
+    if (this.hasUmbrella && this.stateName == "Walker") {
+      screen.draw.filled_circle(this.pos, 5, "red");
     }
     if (this.game.debug) {
-        pygame.draw.circle(screen, (255, 0, 0), (this.rect.right, this.rect.bottom + 1), 5);
-        pygame.draw.circle(screen, (255, 255, 0), (this.rect.left, this.rect.bottom + 1), 5);
-        if (this.stateName == "Blocker") {
-            blockArea = pygame.Rect(this.rect.x, this.rect.centery, 40, 44);
-            pygame.draw.rect(screen, (255,0,0), blockArea, 1);
-        }
-    }*/
+      screen.draw.filled_circle(
+        [this.rect.right, this.rect.bottom + 1],
+        5,
+        "red",
+      );
+      screen.draw.filled_circle(
+        [this.rect.left, this.rect.bottom + 1],
+        5,
+        [255, 255, 0],
+      );
+    }
   }
 
   // update a lemming's position in the level
@@ -60,8 +62,8 @@ class Lemming extends Entity {
 
   is_near(pos, distance) {
     const myRect = new Rect(
-      self.x - distance,
-      self.y - distance,
+      this.x - distance,
+      this.y - distance,
       distance * 2,
       distance * 2,
     );

@@ -14,15 +14,15 @@ class Obj {
     this.animTimer = 0;
   }
 
-  x() {
+  get x() {
     return this.rect.centerx;
   }
 
-  y() {
+  get y() {
     return this.rect.bottom;
   }
 
-  pos() {
+  get pos() {
     return [this.x, this.y];
   }
 
@@ -36,8 +36,9 @@ class Obj {
     }
     let frame = this.frames[this.frame % this.frames.length];
     screen.blit(frame, this.rect);
-    // if this.game.debug:
-    //     triggerArea = pygame.Rect(this.x - 6, this.y - 6, 12, 12)
-    //     pygame.draw.rect(screen, (255,0,0), triggerArea, 1)
+    if (this.game.debug) {
+      var triggerArea = new Rect(this.x - 6, this.y - 6, 12, 12);
+      screen.draw.rect(triggerArea, "red");
+    }
   }
 }
