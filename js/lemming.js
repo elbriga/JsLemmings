@@ -55,6 +55,7 @@ class Lemming extends Entity {
       if (skill == "Umbrella") this.hasUmbrella = true;
       else this.set_state(skill);
     }
+    game.build_skills_buttons();
   }
 
   is_near(pos, distance) {

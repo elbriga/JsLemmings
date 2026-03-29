@@ -186,7 +186,7 @@ class Game {
       let skill = new construct(null);
 
       let ico = Assets.animations[`lemming_${skill.ico}`][skill.icoFrame];
-      let color = skillName == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
+      let color = skillName == this.selectedSkill ? [255, 0, 255] : [0, 0, 0];
 
       let btn = new Button(skillName, ico, val, 400 + i * 70, 10, color);
       i += 1;
