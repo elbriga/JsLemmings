@@ -1,13 +1,13 @@
 class LemmingState {
   static states = {};
 
-  constructor(lemming) {
+  constructor(lemming, ico, icoFrame = 0) {
     this.lem = lemming;
+    this.ico = ico;
+    this.icoFrame = icoFrame;
+
     this.anim = "";
     this.animNext = "";
-
-    this.ico = "";
-    this.icoFrame = 0;
   }
 
   update(isRecursion = false) {}
@@ -17,18 +17,15 @@ class LemmingState {
 
 class Blocker extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "stop");
     this.anim = "stop";
-    this.ico = "stop";
-    this.icoFrame = 0;
   }
 }
 
 class Walker extends LemmingState {
   constructor(lemming) {
-    super(lemming);
-    this.ico = "walk";
-    this.icoFrame = 0;
+    super(lemming, "walk");
+    // Walker nao seta anim automatico
   }
 
   update(isRecursion = false) {
@@ -64,10 +61,8 @@ class Walker extends LemmingState {
 
 class Faller extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "fall");
     // Faller nao seta anim automatico
-    this.ico = "fall";
-    this.icoFrame = 0;
   }
 
   update(isRecursion = false) {
@@ -93,11 +88,9 @@ class Faller extends LemmingState {
 
 class Floater extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "float");
     this.anim = "open";
     this.animNext = "float";
-    this.ico = "float";
-    this.icoFrame = 0;
   }
 
   update(isRecursion = false) {
@@ -112,10 +105,8 @@ class Floater extends LemmingState {
 
 class Digger extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "dig");
     this.anim = "dig";
-    this.ico = "dig";
-    this.icoFrame = 0;
   }
 
   update(isRecursion = false) {
@@ -136,11 +127,9 @@ class Digger extends LemmingState {
 
 class Exploder extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "boom", 6);
     this.anim = "boom";
     this.animNext = "explosion";
-    this.ico = "boom";
-    this.icoFrame = 0;
   }
 
   update(isRecursion = false) {
@@ -160,10 +149,8 @@ class Exploder extends LemmingState {
 
 class Builder extends LemmingState {
   constructor(lemming) {
-    super(lemming);
+    super(lemming, "build");
     this.anim = "build";
-    this.ico = "build";
-    this.icoFrame = 0;
   }
 
   on_cycle_anim() {
