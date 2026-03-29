@@ -70,7 +70,9 @@ class Assets {
   }
 
   static async load() {
-    await Promise.all([
+    const [exit, tnt] = await Promise.all([
+      Assets.loadImage("images/portal.png"),
+      Assets.loadImage("images/tnt.png"),
       // https://www.spriters-resource.com/amiga_amiga_cd32/lemmings/asset/37732/
       this.loadSheet("images/lemming_sheet.png", (sheet) => {
         Assets.animations["lemming_null"] = Assets.slice_sprites(
@@ -211,13 +213,13 @@ class Assets {
       }),
     ]);
 
-    /* TODO
-        // Objects
-        Assets.animations["object_exit"] = [ images.portal ];
-        Assets.animations["object_tnt"]  = [ images.tnt ];
+    // Objects
+    Assets.animations["object_exit"] = [exit];
+    Assets.animations["object_tnt"] = [tnt];
 
-        //sheet = pygame.image.load("images/tocha.png").convert_alpha();
-        //Assets.animations["object_tocha"]  = cls.slice_sprites(sheet, 4, 0, 0, 38, 38, 68);
+    /* TODO
+    //sheet = pygame.image.load("images/tocha.png").convert_alpha();
+    //Assets.animations["object_tocha"]  = cls.slice_sprites(sheet, 4, 0, 0, 38, 38, 68);
 */
     console.log("Sprites carregados ✔");
   }

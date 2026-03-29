@@ -32,10 +32,10 @@ class Game {
     const [level, assets, objects] = await Promise.all([
       Level.create(numLevel),
       Assets.load(),
-      this.load_objects(),
     ]);
 
     this.level = level;
+    this.load_objects();
     this.build_skills_buttons();
   }
 
@@ -135,7 +135,7 @@ class Game {
 
     // Desenhar os Objetos
     for (let o of this.entities) {
-      o.draw();
+      o.draw(screen);
     }
 
     // Desenhar os Lemmings
@@ -231,13 +231,11 @@ class Game {
   }
 
   load_objects() {
-    // TODO
-    return;
     for (const objDef of this.level.config.objects) {
       // Verificar se existe nos Assets
       const type = "object_" + objDef["type"];
       if (type in Assets.animations) {
-        this.entities.append(new Object(this, objDef));
+        this.entities.push(new Obj(this, objDef));
       }
     }
   }
