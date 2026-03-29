@@ -44,7 +44,11 @@ class Game {
 
   armaggedon(quit = False) {
     if (quit) this.quitting = true;
-    for (const l of this.lemmings) if (!l.dead) l.set_state("Exploder");
+    for (const l of this.lemmings) {
+      if (!l.dead) {
+        l.set_state("Exploder");
+      }
+    }
   }
 
   async new() {
