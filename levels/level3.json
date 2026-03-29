@@ -16,12 +16,12 @@
   },
 
   "objects": [
-    {"type": "entrance", "x": 100, "y": 100},
-    {"type": "exit", "x": 580, "y": 710},
+    { "type": "entrance", "x": 100, "y": 100 },
+    { "type": "exit", "x": 580, "y": 710 },
 
-    {"type":"water","x":450,"y":250},
-    {"type":"steel","x":300,"y":180,"w":64,"h":32},
-    {"type":"trap","x":600,"y":210},
-    {"type":"decoration","sprite":"tree","x":200,"y":150}
+    { "type": "water", "x": 450, "y": 250 },
+    { "type": "steel", "x": 300, "y": 180, "w": 64, "h": 32 },
+    { "type": "trap", "x": 600, "y": 210 },
+    { "type": "decoration", "sprite": "tree", "x": 200, "y": 150 }
   ]
 }
