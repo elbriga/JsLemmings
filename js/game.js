@@ -13,6 +13,7 @@ class Game {
     this.endScene = undefined;
     this.lemmings = [];
     this.entities = [];
+    this.skillsButtons = [];
     this.newLevel = undefined; // Controla o Spawn de um novo Level ou o mesmo (reset)
     this.points = 0;
     this.totLemmings = 0;
@@ -35,6 +36,7 @@ class Game {
     ]);
 
     this.level = level;
+    this.build_skills_buttons();
   }
 
   quit() {
@@ -157,14 +159,8 @@ class Game {
     screen.draw.text(scoreText, { pos: [10, 10], color: "black" });
 
     // Desenhar as Skills
-    let i = 0;
-    for (const key in this.level.config.skills) {
-      let val = this.level.config.skills[key];
-      if (val <= 0) continue;
-      let color = key == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
-      let text = `${key}: ${val}`;
-      screen.draw.text(text, { pos: [400, 10 + i * 20], color: color });
-      i += 1;
+    for (const btn of this.skillsButtons) {
+      btn.draw(screen);
     }
 
     if (this.endScene) {
@@ -175,6 +171,30 @@ class Game {
       screen.blit(this.endScene, [x, y]);
       //let b = 5;
       //screen.draw.rect((255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10);
+    }
+  }
+
+  build_skills_buttons() {
+    let i = 0;
+    this.skillsButtons = [];
+    for (let key in this.level.config.skills) {
+      let val = this.level.config.skills[key];
+      if (val <= 0) continue;
+
+      if (key == "Umbrella") {
+        key = "Floater";
+      }
+      let construct = LemmingState.states[key];
+
+      let skill = new construct(null);
+
+      let ico = Assets.animations[`lemming_${skill.ico}`][skill.icoFrame];
+      let color = key == this.selectedSkill ? [0, 255, 255] : [0, 0, 0];
+
+      let btn = new Button(ico, val, 400 + i * 70, 10, color);
+      i += 1;
+
+      this.skillsButtons.push(btn);
     }
   }
 
