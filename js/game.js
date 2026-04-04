@@ -14,7 +14,7 @@ class Game {
     this.quitting = false;
     this.endScene = undefined;
     this.lemmings = [];
-    this.entities = [];
+    this.objs = [];
     this.skillsButtons = [];
     this.points = 0;
     this.totLemmings = 0;
@@ -29,8 +29,16 @@ class Game {
     this.skillsFont = "30px Arial";
 
     this.level = level;
+    // load objs
+    for (const objDef of this.level.config.objects) {
+      // Verificar se existe nos Assets
+      const objName = objDef["type"];
+      if (objName in Obj.classes) {
+        let newObj = new Obj.classes[objName](this, objDef);
+        this.objs.push(newObj);
+      }
+    }
 
-    this.load_objects();
     this.build_skills_buttons();
   }
 
@@ -84,17 +92,29 @@ class Game {
     }
 
     // Atualizar os Lemmings
-    var removed = false;
+    var removedLemming = false;
     for (let lem of this.lemmings) {
       if (!lem.dead) {
         lem.update();
-        // Checar pela saida
-        if (lem.is_near(this.level.config.endPosition, 6)) {
-          this.points += 1;
-          lem.die("gone");
-        } else if (lem.rect.y > this.height) {
+        if (lem.rect.y >= this.height) {
           // Checar se caiu para fora da tela
           lem.die("null");
+          lem.remove = true;
+          removedLemming = true;
+          continue;
+        }
+
+        // Checar pelos objetos
+        var removedObj = false;
+        for (let o of this.objs) {
+          if (!o.remove && lem.is_near(o.pos, o.collide)) {
+            if (o.activate(game, lem)) {
+              removedObj = true;
+            }
+          }
+        }
+        if (removedObj) {
+          this.objs = this.objs.filter((o) => !o.remove);
         }
       }
 
@@ -111,13 +131,13 @@ class Game {
           } else if (lem.dead) {
             // Remover os lemmings mortos no final da animacao
             lem.remove = true;
-            removed = true;
+            removedLemming = true;
           }
         }
       }
     }
 
-    if (removed) {
+    if (removedLemming) {
       this.lemmings = this.lemmings.filter((l) => !l.remove);
       // Verificar se terminou a fase
       if (this.lemmings.length == 0) {
@@ -141,7 +161,7 @@ class Game {
     this.level.draw(screen, this.showMask);
 
     // Desenhar os Objetos
-    for (let o of this.entities) {
+    for (let o of this.objs) {
       o.draw(screen);
     }
 
@@ -234,16 +254,6 @@ class Game {
       this.selectedSkill = skillName;
       // Atualizar o selecionado
       this.build_skills_buttons();
-    }
-  }
-
-  load_objects() {
-    for (const objDef of this.level.config.objects) {
-      // Verificar se existe nos Assets
-      const type = "object_" + objDef["type"];
-      if (type in Assets.animations) {
-        this.entities.push(new Obj(this, objDef));
-      }
     }
   }
 }

@@ -17,10 +17,10 @@
 
   "objects": [
     { "type": "entrance", "x": 100, "y": 100 },
-    { "type": "exit", "x": 580, "y": 722 },
+    { "type": "ExitPortal", "x": 580, "y": 722 },
 
-    { "type": "tnt", "x": 450, "y": 240 },
-    { "type": "tocha", "x": 300, "y": 180, "w": 64, "h": 32 },
+    { "type": "TNT", "x": 450, "y": 240 },
+    { "type": "Tocha", "x": 300, "y": 180, "w": 64, "h": 32 },
 
     { "type": "trap", "x": 600, "y": 210 },
     { "type": "decoration", "sprite": "tree", "x": 200, "y": 150 }

@@ -86,8 +86,9 @@ class Level {
     this.terrain.reloadImageData(); // Hack!!
   }
 
-  dig_hole(pos) {
-    this.terrain.draw.filled_circle(pos, this.explosionRadius, "erase");
+  dig_hole(pos, radius = 0) {
+    if (!radius) radius = this.explosionRadius;
+    this.terrain.draw.filled_circle(pos, radius, "erase");
     this.terrain.reloadImageData(); // Hack!!
   }
 

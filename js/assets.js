@@ -1,28 +1,3 @@
-function debugSprite(sprite, label = "") {
-  const container = document.createElement("div");
-
-  const canvas = sprite.canvas || document.createElement("canvas");
-
-  if (!sprite.canvas) {
-    canvas.width = sprite.width;
-    canvas.height = sprite.height;
-    canvas.getContext("2d").drawImage(sprite, 0, 0);
-  }
-
-  const text = document.createElement("div");
-  text.innerText = label;
-  text.style.color = "white";
-  text.style.fontSize = "10px";
-
-  canvas.style.border = "1px solid red";
-  canvas.style.imageRendering = "pixelated";
-
-  container.appendChild(canvas);
-  container.appendChild(text);
-
-  document.getElementById("debug").appendChild(container);
-}
-
 class Assets {
   static animations = {};
   static final_width = 10; // x4
@@ -214,8 +189,8 @@ class Assets {
     ]);
 
     // Objects
-    Assets.animations["object_exit"] = [exit];
-    Assets.animations["object_tnt"] = [tnt];
+    Assets.animations["object_ExitPortal"] = [exit];
+    Assets.animations["object_TNT"] = [tnt];
 
     /* TODO
     //sheet = pygame.image.load("images/tocha.png").convert_alpha();

@@ -2,7 +2,7 @@ import pygame
 from assets import Assets
 from lemming import Lemming
 from level import Level
-from object import Object
+from obj import Obj
 
 class Game:
     def __init__(self, screen, numLevel):

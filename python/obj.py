@@ -2,7 +2,7 @@ import pygame
 from assets import Assets
 
 # TODO : Unir Entity e Object
-class Object:
+class Obj:
     def __init__(self, game, objDef):
         name = objDef["type"]
         x = objDef["x"]
