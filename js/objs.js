@@ -1,4 +1,3 @@
-// TODO : Unir Entity e Obj
 class ExitPortal extends Obj {
   activate(lem) {
     this.game.points += 1;

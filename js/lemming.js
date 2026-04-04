@@ -1,6 +1,18 @@
-class Lemming extends Entity {
+class Lemming {
   constructor(game) {
-    super(game, 40, 80);
+    this.game = game;
+    let width = 40;
+    let height = 80;
+
+    let x = game.level.config.startPosition[0];
+    let y = game.level.config.startPosition[1];
+    this.rect = new Rect(x, y - height, width, height);
+    this.frames = [];
+    this.frame = 0;
+    this.animTimer = 0;
+    this.animNext = "";
+    this.dead = false;
+
     this.stateName = "";
     this.stateTimer = 0; // Timer auxiliar para os estados
     this.direction = 1;
@@ -11,6 +23,18 @@ class Lemming extends Entity {
     this.remove = false;
     this.set_state("Faller"); // Faller nao seta a animation!
     this.set_animation("fall");
+  }
+
+  get x() {
+    return this.rect.centerx;
+  }
+
+  get y() {
+    return this.rect.bottom;
+  }
+
+  get pos() {
+    return [this.x, this.y];
   }
 
   draw() {
@@ -39,6 +63,16 @@ class Lemming extends Entity {
   // update a lemming's position in the level
   update(isRecursion = false) {
     this.state.update(isRecursion);
+  }
+
+  set_animation(name, next = "") {
+    this.frames = Assets.animations[`lemming_${name}`];
+    this.animNext = next;
+    this.frame = 0;
+    if (name == "null") {
+      // Forçar remover na virada da animacao
+      this.animTimer = 9999;
+    }
   }
 
   // Repassar os eventos para o estado

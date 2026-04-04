@@ -1,4 +1,4 @@
-// TODO : Unir Entity e Obj
+// TODO : Lemming extends Obj
 class Obj {
   static classes = {};
 
