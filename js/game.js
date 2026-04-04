@@ -31,12 +31,10 @@ class Game {
     this.level = level;
     // load objs
     for (const objDef of this.level.config.objects) {
-      // Verificar se existe nos Assets
       const objName = objDef["type"];
-      if (objName in Obj.classes) {
-        let newObj = new Obj.classes[objName](this, objDef);
-        this.objs.push(newObj);
-      }
+      const objX = objDef["x"];
+      const objY = objDef["y"];
+      this.spwan_obj(objName, objX, objY);
     }
 
     this.build_skills_buttons();
@@ -57,6 +55,22 @@ class Game {
         l.set_state("Exploder");
       }
     }
+  }
+
+  spwan_obj(objName, x, y) {
+    // Verificar se existe nos Assets
+    if (!(objName in Obj.classes)) {
+      console.log(`OBJ [${objName}] NOT FOUND`);
+      return;
+    }
+
+    let newObj = new Obj.classes[objName](this, objName, x, y); // TODO :: Usar o nome da classe ao inves de criar objName
+    this.objs.push(newObj);
+  }
+
+  explosion(pos, radius = 0) {
+    this.level.dig_hole(pos, radius);
+    this.spwan_obj("Explosion", pos[0], pos[1]);
   }
 
   async new() {
@@ -98,9 +112,7 @@ class Game {
         lem.update();
         if (lem.rect.y >= this.height) {
           // Checar se caiu para fora da tela
-          lem.die("null");
-          lem.remove = true;
-          removedLemming = true;
+          lem.die();
           continue;
         }
 
@@ -108,13 +120,14 @@ class Game {
         var removedObj = false;
         for (let o of this.objs) {
           if (!o.remove && lem.is_near(o.pos, o.collide)) {
-            if (o.activate(game, lem)) {
+            o.activate(lem);
+            if (o.remove) {
               removedObj = true;
             }
           }
         }
         if (removedObj) {
-          this.objs = this.objs.filter((o) => !o.remove);
+          this.remove_old_objects();
         }
       }
 
@@ -161,8 +174,15 @@ class Game {
     this.level.draw(screen, this.showMask);
 
     // Desenhar os Objetos
+    let removedObj = false;
     for (let o of this.objs) {
       o.draw(screen);
+      if (o.remove) {
+        removedObj = true;
+      }
+    }
+    if (removedObj) {
+      this.remove_old_objects();
     }
 
     // Desenhar os Lemmings
@@ -199,6 +219,10 @@ class Game {
       //let b = 5;
       //screen.draw.rect((255,255,255,255), (x-b,y-b,w+b,h+b), 10, 10);
     }
+  }
+
+  remove_old_objects() {
+    this.objs = this.objs.filter((o) => !o.remove);
   }
 
   build_skills_buttons() {

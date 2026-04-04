@@ -121,7 +121,7 @@ class Lemming extends Entity {
     }
   }
 
-  die(anim, nextAnim = "") {
+  die(anim = "null", nextAnim = "") {
     this.set_state("Dying");
     this.set_animation(anim, nextAnim);
   }

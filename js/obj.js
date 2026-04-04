@@ -2,17 +2,17 @@
 class Obj {
   static classes = {};
 
-  constructor(game, objDef) {
-    this.name = objDef["type"];
-    let x = objDef["x"];
-    let y = objDef["y"];
-
+  constructor(game, name, x, y) {
+    // TODO name == class_name
     this.game = game;
-    this.remove = false;
+    this.name = name;
+
     this.frames = Assets.animations[`object_${this.name}`];
     let width = this.frames[0].width;
     let height = this.frames[0].height;
     this.rect = new Rect(x - width / 2, y - height, width, height);
+
+    this.remove = false;
     this.frame = 0;
     this.animTimer = 0;
     //this.collideRect = TODO;
@@ -33,15 +33,21 @@ class Obj {
 
   update() {}
 
-  activate(game, lem) {
-    return false;
-  }
+  activate(lem) {}
+
+  on_cycle_anim() {}
 
   draw(screen) {
     this.animTimer += 1;
     if (this.animTimer > 3) {
       this.animTimer = 0;
       this.frame = (this.frame + 1) % this.frames.length;
+      if (!this.frame) {
+        this.on_cycle_anim();
+        if (this.remove) {
+          return;
+        }
+      }
     }
     let frame = this.frames[this.frame % this.frames.length];
     screen.blit(frame, this.rect);

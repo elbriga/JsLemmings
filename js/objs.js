@@ -1,29 +1,31 @@
 // TODO : Unir Entity e Obj
 class ExitPortal extends Obj {
-  activate(game, lem) {
-    game.points += 1;
+  activate(lem) {
+    this.game.points += 1;
     lem.die("gone");
   }
 }
 
 class TNT extends Obj {
-  constructor(game, objDef) {
-    super(game, objDef);
+  constructor(game, name, x, y) {
+    super(game, name, x, y);
     //this.collideRect = TODO;
     this.collide = 30;
   }
 
-  activate(game, lem) {
+  activate(lem) {
     console.log("FIRE!!!!");
-    game.level.dig_hole(this.pos, 100);
-    //new Explosion(); // TODO
+    this.game.explosion(this.pos, 100);
+    lem.die();
     this.remove = true;
-    return true;
   }
 }
 
 class Explosion extends Obj {
-  // TODO!!
+  on_cycle_anim() {
+    // Rodar a animação uma vez e remover
+    this.remove = true;
+  }
 }
 
-Obj.classes = { ExitPortal, TNT };
+Obj.classes = { ExitPortal, TNT, Explosion };

@@ -129,7 +129,6 @@ class Exploder extends LemmingState {
   constructor(lemming) {
     super(lemming, "boom", 6);
     this.anim = "boom";
-    this.animNext = "explosion";
   }
 
   update(isRecursion = false) {
@@ -139,11 +138,10 @@ class Exploder extends LemmingState {
     }
   }
 
-  on_change_anim() {
+  on_cycle_anim() {
     const lem = this.lem;
+    lem.game.explosion(lem.pos);
     lem.dead = true;
-    lem.game.level.dig_hole(lem.pos);
-    lem.rect.x -= 12; // HACK feio! Explosao é maior
   }
 }
 

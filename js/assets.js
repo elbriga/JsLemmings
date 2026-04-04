@@ -171,18 +171,14 @@ class Assets {
 
       // https://opengameart.org/content/explosion
       this.loadSheet("images/explosion.png", (sheet) => {
-        Assets.animations["lemming_explosion"] = [];
+        Assets.animations["object_Explosion"] = [];
         var explosionSize = 64;
         for (var y = 0; y < 4 * explosionSize; y += explosionSize) {
           for (var x = 0; x < 4 * explosionSize; x += explosionSize) {
-            var sprite = new Sprite(explosionSize, 100);
-            sprite.blit(
-              sheet,
-              [0, 100 - explosionSize],
-              [x, y, explosionSize, explosionSize],
-            );
+            var sprite = new Sprite(explosionSize, explosionSize);
+            sprite.blit(sheet, [0, 0], [x, y, explosionSize, explosionSize]);
             sprite.set_colorkey(0, 0, 0);
-            Assets.animations["lemming_explosion"].push(sprite);
+            Assets.animations["object_Explosion"].push(sprite);
           }
         }
       }),

@@ -35,6 +35,10 @@ class Entity {
     this.frames = Assets.animations[`lemming_${name}`];
     this.animNext = next;
     this.frame = 0;
+    if (name == "null") {
+      // Forçar remover na virada da animacao
+      this.animTimer = 9999;
+    }
   }
 
   // Invocado quando a animacao reseta
