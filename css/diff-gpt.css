@@ -1,0 +1,62 @@
+.diff-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 20px 0;
+  font-family: monospace;
+}
+
+.diff-box {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background: #1e1e1e;
+  color: #ddd;
+}
+
+.diff-header {
+  padding: 10px 14px;
+  background: #2a2a2a;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.diff-content {
+  display: flex;
+  height: 300px;
+}
+
+.diff-column {
+  width: 50%;
+  overflow: auto;
+  border-right: 1px solid #333;
+}
+
+.diff-column:last-child {
+  border-right: none;
+}
+
+.line {
+  display: flex;
+  padding: 0 10px;
+  white-space: pre;
+}
+
+.line-number {
+  width: 40px;
+  color: #777;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.line.match {
+  background: rgba(0, 255, 100, 0.1);
+}
+
+.line.similar {
+  background: rgba(255, 200, 0, 0.15);
+}
+
+.line.diff {
+  background: rgba(255, 80, 80, 0.15);
+}

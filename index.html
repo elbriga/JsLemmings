@@ -13,12 +13,12 @@
         margin-left: 1em;
       }
     </style>
-    <link rel="stylesheet" href="css/diff.css" />
+    <link rel="stylesheet" href="css/diff-gpt.css" />
   </head>
 
   <body>
-    <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
-    <script src="diff/diff.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script> -->
+    <script src="diff/diff-gpt.js"></script>
 
     <script src="js/lib/jsgame0.js"></script>
     <script src="js/lib/draw.js"></script>
@@ -27,6 +27,7 @@
     <script src="js/lib/screen.js"></script>
 
     <script src="js/obj.js"></script>
+    <script src="js/objs.js"></script>
     <script src="js/button.js"></script>
     <script src="js/events.js"></script>
     <script src="js/input.js"></script>
@@ -65,8 +66,23 @@
       <div id="diffs-container"></div>
     </main>
     <script>
-      const diffsContainer = document.getElementById("diffs-container");
-      diffsContainer.appendChild(diff("js/game.js", "python/game.py"));
+      async function addDiffs() {
+        let files = [
+          "assets",
+          "entity",
+          "events",
+          "game",
+          "lemming",
+          "lemmingState",
+          "level",
+          "obj",
+        ];
+        const diffsContainer = document.getElementById("diffs-container");
+        for (let file of files) {
+          let diffView = await Diff.diff(`python/${file}.py`, `js/${file}.js`);
+          diffsContainer.appendChild(diffView);
+        }
+      }
 
       var game = undefined;
       let numLevel = 1;
@@ -103,6 +119,7 @@
         });
 
         screen.init();
+        addDiffs();
       });
 
       window.addEventListener("keydown", (e) => {
